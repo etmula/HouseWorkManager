@@ -12,10 +12,14 @@
         <!-- jQuery -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
+        <!-- base CSS, JavaScript -->
+        <link rel='stylesheet' href="{% static 'CSS/base.css' %}" type='text/css'></link>
+
+        {% block head %}{% endblock %}
     </head>
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <a class="navbar-brand" href="#">HWM</a>
+            <a class="navbar-brand" href="{% url 'exec:home'%}">{{ user.group.name }}</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -23,7 +27,13 @@
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="#">Start</a>
+                    <a class="nav-link" href="{% url 'exec:exec'%}">exec</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'exec:history'%}">history</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="{% url 'exec:work'%}">work</a>
                 </li>
                 </ul>
                 <ul class="navbar-nav">
@@ -58,7 +68,7 @@
             </div>
         </nav>
             
-        <main role="main" class="container-fluid h-100">
+        <main role="main" class="container h-100">
             {% block content %}{% endblock %} 
         </main><!-- /.container -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
