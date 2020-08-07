@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-left">
+  <div class="card-header">
+    {{work.category.name}}
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ work.name}}</h5>
+    <p class="card-text">
+        <p>alert: {{ work.alert }}</p>
+        <p>description: {{work.description}}</p>
+    </p>
+    
+  </div>
+  <div class="card-footer text-muted">
+    <a href="{% url 'work:work_update' work.id %}" class="btn btn-success">Edit</a>
+    <a href="{% url 'work:work_delete' work.id %}" class="btn btn-danger">Delete</a>
+  </div>
+</div>
+{% endblock %}

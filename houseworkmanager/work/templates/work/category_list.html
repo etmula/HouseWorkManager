@@ -1,0 +1,7 @@
+<ul class='list-group list-group-flush m-1'>
+    {% for category in category_list %}
+        <a href="{{ category.id }}" class='list-group-item row'>
+            <span class='col d-inline-block'>{{ category.name }}</span>
+        </a>
+    {% endfor %}
+</ul>

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h1>
+    {% if not form.instance.pk %}
+    Create category
+    {% else %}
+    Update category
+    {% endif %}
+</h1>
+ 
+<form class="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <input type="submit" class="btn btn-primary" value="submit">
+</form>
+
+{% endblock %}
