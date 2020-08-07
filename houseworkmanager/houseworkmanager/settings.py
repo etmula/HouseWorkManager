@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import environ
+from django.urls import reverse
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,6 +38,8 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'work.apps.WorkConfig',
+    'history.apps.HistoryConfig',
     'accounts.apps.AccountsConfig',
     'exec.apps.ExecConfig',
     'django.contrib.admin',
@@ -45,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -53,8 +57,17 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
+    'accounts:login',
+    'accounts:logout',
+    'accounts:signup',
+    'admin:index',
+    'admin:login',
 ]
 
 ROOT_URLCONF = 'houseworkmanager.urls'
@@ -118,6 +131,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# django-crippy-forms
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
@@ -127,6 +142,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = '/code/static'
 
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'exec:index'
+LOGIN_REDIRECT_URL = 'exec:home'
 
 AUTH_USER_MODEL = 'accounts.User'
