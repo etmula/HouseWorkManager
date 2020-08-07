@@ -18,13 +18,18 @@ from django.core.mail import send_mail
 from django.shortcuts import redirect, resolve_url
 from django.core.signing import SignatureExpired, BadSignature, loads, dumps
 from django.http import HttpResponseBadRequest
-from .models import User
+from .models import User, Group
 
 
 class SignUpView(generic.CreateView):
     form_class = MyUserCreationForm
     success_url = reverse_lazy('accounts:login')
     template_name = 'accounts/signup.html'
+
+    def form_valid(self, form):
+        group = Group.objects.create(name='self')
+        form.instance.group_id = group.id
+        return super().form_valid(form)
 
 
 class Login(LoginView):

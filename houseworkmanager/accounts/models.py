@@ -37,9 +37,24 @@ class CustomUserManager(UserManager):
         return self._create_user(username, email, password, **extra_fields)
 
 
+class Group(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
+
+    def get_works(self):
+        works = []
+        for category in self.categorys.all():
+            works.extend([work for work in category.works.all()])
+        return works
+
+
 class User(AbstractBaseUser, PermissionsMixin):
     """カスタムユーザーモデル."""
     username_validator = UnicodeUsernameValidator()
+
+    group = models.ForeignKey('Group', related_name='users', on_delete=models.PROTECT, default=None, null=True, blank=True)
 
     username = models.CharField(
         _('username'),
@@ -95,6 +110,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Return the short name for the user."""
         return self.first_name
 
+    def calc_point(self):
+        total_point = 0
+        for recode in self.recodes.all():
+            total_point += recode.point
+        return total_point
+
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+

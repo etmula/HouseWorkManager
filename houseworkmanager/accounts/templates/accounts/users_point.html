@@ -1,0 +1,19 @@
+<ul class="nav nav-pills nav-fill m-1">
+    {% for user in user.group.users.all %}
+        <!--
+            <div class='card text-center{% ifequal request.user.username user.username %} border-primary{% endifequal %}'>
+                <div class="card-header bg-transparent p-6">{{ user.username }}</div>
+                <div class="card-body p-10">
+                    <h5 class="card-title">{{ user.calc_point }}</h5>
+                </div>
+            </div>
+        </div>-->
+        
+            <li class="nav-item">
+                <a class="nav-link {% ifequal request.user.username user.username %} active {% endifequal %}" href="{% url 'work:work_list'%}">
+                    <p class='m-0'>{{ user.username}}</p>
+                    <p class='m-0'>{{ user.calc_point}}</p>
+                </a>
+            </li>
+    {% endfor %}
+</ul>
