@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a href="{% url 'history:recode_create'%}" class='btn btn-primary w-100 stiky-top'>Create</a>
+{% include 'history/recode_list.html'%}
+{% endblock %}

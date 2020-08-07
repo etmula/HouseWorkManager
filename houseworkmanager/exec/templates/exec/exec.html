@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block head %}
+
+<!-- Bootstrap-datepicker -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ja.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+
+{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<!-- Users points-->
+{% include 'accounts/users_point.html'%}
+
+
+<input data-provide="datepicker" class="form-control datepicker m-1" type="text" name="date" value=""　placeholder="Date">
+
+<ul class='list-group list-group-flush'>
+    {% for work in view.group.get_works %}
+        <div class="list-group-item row pr-0 work" count=0
+            work-id='{{work.id}}'おやよう category='{{work.category.name}}' name='{{work.name}}' point='{{work.point}}' description='{{work.description}}' alert='{{work.alert}}'>
+            <span class='col-8 d-inline-block p-0 m-0 row'>
+                <span class='col-2 d-inline-block px-0'>{{ work.category.name}}</span>
+                <span class="col-6 d-inline-block px-0">{{work.name}}</span>
+                <span class="col-2 d-inline-block px-0">{{work.point}}</span>
+            </span>
+            <div class="btn-group btn-group-sm col-3 p-0" role="group">
+                <button type="button" class="btn btn-secondary counter" count='down'>-</button>
+                <button type="button" class="btn btn-secondary count-label disabled">0</button>
+                <button type="button" class="btn btn-secondary counter" count='up'>+</button>
+            </div>
+            <!--
+            <button type="button" class="col-2 px-0 btn btn-sm btn-success show-work-modal d-inline-block"
+                data-toggle='modal' data-target='#work-detail-modal'>
+                詳細
+            </button>
+            -->
+        </div>
+    {% endfor %}
+</ul>
+<div class='text-right fixed-bottom'>
+    <button class='btn btn-success shadow-sm presubmit-work  m-2' data-toggle='modal' data-target='#submit-modal'>
+        Exec <span class="badge badge-light">0</span>
+    </button>
+</div>
+
+
+<!-- Work Modal -->
+<div class="modal fade" id="work-detail-modal" tabindex="-1" role="dialog" aria-labelledby="workModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="workModalCenterTitle">仕事名</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+<!-- Submit Modal -->
+<div class="modal fade" id="submit-modal" tabindex="-1" role="dialog" aria-labelledby="submitModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="submitModalCenterTitle">最終確認</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        <ul class='list-group list-group-flush'>
+        
+        </ul>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">キャンセル</button>
+        <button type="button" class="btn btn-success submit_work">実行</button>
+        </div>
+    </div>
+    </div>
+</div>
+
+<script src="{% static 'exec/js/exec.js' %}"></script>
+{% endblock %}
