@@ -7,6 +7,9 @@
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ja.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
 
+<!-- jquery-cookie -->
+<script src="{% static 'exec/js/jquery.cookie.js' %}"></script>
+
 {% endblock %}
 
 {% block content %}
@@ -21,23 +24,18 @@
 <ul class='list-group list-group-flush'>
     {% for work in view.group.get_works %}
         <div class="list-group-item row pr-0 work" count=0
-            work-id='{{work.id}}'おやよう category='{{work.category.name}}' name='{{work.name}}' point='{{work.point}}' description='{{work.description}}' alert='{{work.alert}}'>
-            <span class='col-8 d-inline-block p-0 m-0 row'>
+            work-id='{{work.id}}' category='{{work.category.name}}' name='{{work.name}}' point='{{work.point}}' description='{{work.description}}' alert='{{work.alert}}'>
+            <a class='col-8 d-inline-block p-0 m-0 row show-work-modal text-primary' href='{{ work.get_absolute_url }}' 
+              data-target='modal' data-target='#work-modal'>
                 <span class='col-2 d-inline-block px-0'>{{ work.category.name}}</span>
                 <span class="col-6 d-inline-block px-0">{{work.name}}</span>
                 <span class="col-2 d-inline-block px-0">{{work.point}}</span>
-            </span>
+            </a>
             <div class="btn-group btn-group-sm col-3 p-0" role="group">
-                <button type="button" class="btn btn-secondary counter" count='down'>-</button>
-                <button type="button" class="btn btn-secondary count-label disabled">0</button>
-                <button type="button" class="btn btn-secondary counter" count='up'>+</button>
+                <button  class="btn btn-secondary counter" count='down'>-</button>
+                <button  class="btn btn-secondary count-label disabled">0</button>
+                <button  class="btn btn-secondary counter" count='up'>+</button>
             </div>
-            <!--
-            <button type="button" class="col-2 px-0 btn btn-sm btn-success show-work-modal d-inline-block"
-                data-toggle='modal' data-target='#work-detail-modal'>
-                詳細
-            </button>
-            -->
         </div>
     {% endfor %}
 </ul>
@@ -89,6 +87,5 @@
     </div>
     </div>
 </div>
-
 <script src="{% static 'exec/js/exec.js' %}"></script>
 {% endblock %}

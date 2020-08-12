@@ -3,10 +3,12 @@ import json
 from django.shortcuts import reverse, HttpResponse
 from django.views.generic import TemplateView, ListView
 from django.utils.functional import cached_property
+from django.utils import timezone
 
 from history.models import Recode
 from history.views import RecodeListView
 from work.views import WorkListView, CategoryListView
+from stats.table_generator import score_user_line, work_exected_column
 
 
 class ExecView(TemplateView):
@@ -37,6 +39,13 @@ class ExecView(TemplateView):
 
 class HomeView(TemplateView):
     template_name = 'exec/home.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        now = timezone.now()
+        context['score_user_data'] = score_user_line(self.request.user.group.users.all(), now.year, now.month)
+        context['work_exected_data'] = work_exected_column(self.request.user.group, now.year, now.month)
+        return context
 
     @cached_property
     def group(self):
