@@ -6,6 +6,7 @@ from django import forms
 
 from .models import Work, Category
 from accounts.models import Group
+from history.models import Recode
 
 
 class WorkCreateView(CreateView):
@@ -28,6 +29,14 @@ class WorkCreateView(CreateView):
 
 class WorkDetailView(DetailView):
     model = Work
+
+'''
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        work_name = 
+        context['data'] = [for recode in Recode.objects.filter(name=self.request.)]
+        return context'''
 
 
 class WorkDeleteView(DeleteView):

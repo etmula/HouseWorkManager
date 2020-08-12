@@ -8,6 +8,10 @@ class Category(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    def get_absolute_url(self):
+        return reverse("work:category_detail", kwargs={"pk": self.pk})
+    
+
 class Work(models.Model):
     category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='works')
     name = models.CharField(max_length=30)
