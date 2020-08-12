@@ -8,3 +8,7 @@ body {
     width: 100%;
     padding: 0px;
 }
+
+html {
+    touch-action: manipulation;
+  }
