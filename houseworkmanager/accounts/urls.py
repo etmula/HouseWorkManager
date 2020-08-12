@@ -18,4 +18,7 @@ urlpatterns = [
     path('email/change/complete/<str:token>/', views.EmailChangeComplete.as_view(), name='email_change_complete'),
     path('user_detail/<int:pk>/', views.UserDetail.as_view(), name='user_detail'),
     path('user_update/<int:pk>/', views.UserUpdate.as_view(), name='user_update'),
+    path('group/update/<int:pk>', views.GroupUpdateView.as_view(), name='group_update'),
+    path('group/detail/<int:pk>', views.GroupDetailView.as_view(), name='group_detail'),
+    path('setting/<int:pk>', views.SettingView.as_view(), name='setting'),
 ]
