@@ -38,6 +38,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'stats.apps.StatsConfig',
     'work.apps.WorkConfig',
     'history.apps.HistoryConfig',
     'accounts.apps.AccountsConfig',
