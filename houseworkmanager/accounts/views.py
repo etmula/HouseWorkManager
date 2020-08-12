@@ -168,3 +168,18 @@ class UserUpdate(OnlyYouMixin, generic.UpdateView):
 
     def get_success_url(self):
         return resolve_url('accounts:user_detail', pk=self.kwargs['pk'])
+
+
+class GroupUpdateView(OnlyYouMixin, generic.UpdateView):
+    model = Group
+    
+    fields = ('name',)
+
+
+class GroupDetailView(OnlyYouMixin, generic.DetailView):
+    model = Group
+
+
+class SettingView(OnlyYouMixin, generic.DetailView):
+    model = User
+    template_name = 'accounts/setting.html'
