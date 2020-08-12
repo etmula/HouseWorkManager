@@ -51,7 +51,7 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse("accounts:group_detail", kwargs={"pk": self.pk})
-
+    
 
 class User(AbstractBaseUser, PermissionsMixin):
     """カスタムユーザーモデル."""
@@ -113,9 +113,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Return the short name for the user."""
         return self.first_name
 
-    def calc_point(self):
+    def calc_point(self, startdate=None, enddate=None):
         total_point = 0
-        for recode in self.recodes.all():
+        recodes = self.recodes.all()
+        if startdate and enddate:
+            recodes = recodes.filter(date__range=[startdate, enddate])
+        for recode in recodes.all():
             total_point += recode.point
         return total_point
 
