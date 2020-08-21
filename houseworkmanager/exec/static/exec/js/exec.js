@@ -35,28 +35,10 @@ class Work{
             'point': Number($element.attr('point')),
             'description': $element.attr('description'),
             'alert': Number($element.attr('alert')),
-            'date': submitter.$datepicker.val()
+            'date': submitter.$datepicker.val(),
         };
         return fields
     }
-    /*
-    show_detail(){
-        this.$work_detail_modal.find('.modal-title').html(
-            this.fields.name
-        );
-        let alert_text = this.fields.alert;
-        if(isNaN(this.fields.alert)){
-            alert_text = 'alertなし'
-        }
-        this.$work_detail_modal.find('.modal-title').append(
-            `<span class="badge badge-info mx-1">${alert_text}</span>`
-        );
-        this.$work_detail_modal.find('.modal-body').empty();
-        this.$work_detail_modal.find('.modal-body').append(`<pre>${this.fields.description}</pre>`);
-        this.$work_detail_modal.find('.modal-body').append(`<h5>${this.fields.point}点</h5>`);
-        this.$work_detail_modal.modal('show');
-    }
-    */
 }
 
 
@@ -151,13 +133,6 @@ let date = $.cookie('date');
 if(date !== undefined){
     submitter.$datepicker.val(date)
 }
-/*
-//仕事詳細表示
-$('#main').on('click', '.show-work-modal', function(){
-    work = new Work(Work.read_fields($(this).parent()));
-    work.show_detail()
-});
-*/
 
 //日付変更
 submitter.$datepicker.on('change', function(){

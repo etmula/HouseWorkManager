@@ -43,6 +43,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         now = timezone.now()
+        context['current_date'] = now
         context['score_user_data'] = score_user_line(self.request.user.group.users.all(), now.year, now.month)
         context['work_exected_data'] = work_exected_column(self.request.user.group, now.year, now.month)
         return context
@@ -58,6 +59,7 @@ class HistoryView(RecodeListView):
 
 class WorkView(WorkListView):
     template_name = 'exec/work.html'
+
 
 class CategoryView(CategoryListView):
     template_name = 'exec/category.html'
