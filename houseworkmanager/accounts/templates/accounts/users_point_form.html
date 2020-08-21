@@ -1,0 +1,17 @@
+<div id='User' class="btn-group w-100 stick-top" data-toggle="buttons">
+    {% for current_user in user.group.users.all %}
+        <label class='btn btn-light d-block text-left shadow-sm'>
+            <div class="custom-control custom-checkbox">
+                <input id="user_checkbox_{{ current_user.pk }}" name='user' 
+                    value='{{current_user.pk}}' type='checkbox' autocomplete='off' 
+                    class='align-items-center d-inline user custom-control-input' 
+                    {% ifequal current_user user%} checked {%endifequal%}
+                >
+                <label class="custom-control-label" for="user_checkbox_{{ current_user.pk}}">
+                    <p class='m-0'>{{ current_user.username }}</p>
+                    <p class='m-0'>{{ current_user.calc_point }}</p>
+                </label>
+            </div>
+        </label>
+    {% endfor %}
+</div>

@@ -1,9 +1,9 @@
 <ul class="nav nav-pills nav-fill m-1">
     {% for user in user.group.users.all %}
             <li class="nav-item">
-                <a class="nav-link {% ifequal request.user.username user.username %} active {% endifequal %}" href="{% url 'accounts:user_detail' user.pk%}">
+                <a class="nav-link {% ifequal user.username user.username %} active {% endifequal %}" href="{% url 'accounts:user_detail' user.pk%}">
                     <p class='m-0'>{{ user.username}}</p>
-                    <p class='m-0'>{{ user.calc_point}}</p>
+                    <p class='m-0'>{{ user.calc_point_monthly:}}</p>
                 </a>
             </li>
     {% endfor %}
