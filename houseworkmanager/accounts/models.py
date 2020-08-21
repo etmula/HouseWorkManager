@@ -1,3 +1,6 @@
+from datetime import datetime
+import calendar
+
 from django.db import models
 from django.core.mail import send_mail
 from django.contrib.auth.models import PermissionsMixin, UserManager
@@ -6,6 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.shortcuts import reverse
+
+from history.models import Recode
 
 class CustomUserManager(UserManager):
     use_in_migrations = True
@@ -51,6 +56,58 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse("accounts:group_detail", kwargs={"pk": self.pk})
+    
+    def make_point_dict(self, startdate, enddate):
+        recodes = Recode.objects.filter(group=self, exected_date__range=[startdate, enddate])
+        users = self.users
+        point_dict = {}
+        
+        for recode in recodes:
+            if not recode.workcommit in point_dict.keys():
+                point_dict[recode.workcommit] = {user.username:0 for user in users.all()}
+            for executer in recode.executers.all():
+                    point_dict[recode.workcommit][executer.username] += recode.workcommit.point
+
+        return point_dict
+
+    def make_count_dict(self, startdate, enddate):
+        recodes = Recode.objects.filter(group=self, exected_date__range=[startdate, enddate])
+        users = self.users
+        count_dict = {}
+            
+        for recode in recodes:
+            if not recode.workcommit in count_dict.keys():
+                count_dict[recode.workcommit] = {user.username:0 for user in users.all()}
+            for executer in recode.executers.all():
+                    count_dict[recode.workcommit][executer.username] += 1
+
+        return count_dict
+
+    def build_point_table_monthly(self, year, month):
+        startdate = datetime(year, month, 1)
+        enddate = datetime(year, month, calendar.monthrange(year, month)[1])
+        users = self.users.all()
+        table = [['work_name',] + [user.username for user in users],]
+        point_dict = self.make_point_dict(startdate, enddate)
+        for key, value in point_dict.items():
+            row = [key.name,]
+            for user in users.all():
+                row.append(value[user.username])
+            table.append(row)
+        return table
+
+    def build_count_table_monthly(self, year, month):
+        startdate = datetime(year, month, 1)
+        enddate = datetime(year, month, calendar.monthrange(year, month)[1])
+        users = self.users.all()
+        table = [['work_name',] + [user.username for user in users],]
+        count_dict = self.make_count_dict(startdate, enddate)
+        for key, value in count_dict.items():
+            row = [key.name,]
+            for user in users:
+                row.append(value[user.username])
+            table.append(row)
+        return table
     
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -113,14 +170,33 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Return the short name for the user."""
         return self.first_name
 
-    def calc_point(self, startdate=None, enddate=None):
-        total_point = 0
-        recodes = self.recodes.all()
-        if startdate and enddate:
-            recodes = recodes.filter(date__range=[startdate, enddate])
+    def calc_work_point(self, startdate=None, enddate=None, work=None):    
+        recodes = self.recodes
+        if work:
+            recodes = recodes.filter(workcommit__in=work.commits.all())
+        if startdate:
+            recodes = recodes.filter(exected_date__gte=startdate)
+        if enddate:
+            recodes = recodes.filter(exected_date__lte=enddate)
+
+        points= 0
         for recode in recodes.all():
-            total_point += recode.point
-        return total_point
+            points += recode.point
+        return points
+
+    def calc_work_count(self, work=None, startdate=None, enddate=None):
+        recodes = self.group.recodes.all()
+        print(self.group.recodes.all())
+        print(work)
+        if work:
+            recodes = recodes.filter(workcommit__in=work.commits.all())
+        print(recodes.all())
+        if startdate:
+            recodes = recodes.filter(exected_date__gte=startdate)
+        if enddate:
+            recodes = recodes.filter(exected_date__lte=enddate)
+
+        return len(recodes)
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
