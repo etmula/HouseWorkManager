@@ -1,10 +1,5 @@
 {% extends 'base.html' %}
-
-{% block head %}
-<script>
-var DATA = JSON.parse('{{ data|safe }}')
-</script>
-{% endblock %}
+{% load charts %}
 
 {% block content %}
 <div class="card text-left m-1">
@@ -12,16 +7,20 @@ var DATA = JSON.parse('{{ data|safe }}')
     {{work.category.name}}
   </div>
   <div class="card-body">
-    <h5 class="card-title">{{ work.name}}</h5>
+    <h5 class="card-title">{{ work.head.name}}</h5>
     <p class="card-text">
         <p>alert: {{ work.alert }}</p>
-        <p>description: {{work.description}}</p>
+        <p>created_at: {{work.head.created_at}}</p>
+        <p>point: {{work.head.point}}</p>
+        <p>description: {{work.head.description}}</p>
     </p>
     
   </div>
   <div class="card-footer text-muted">
-    <a href="{% url 'work:work_update' work.id %}" class="btn btn-success">Edit</a>
+    <a href="{% url 'work:workcommit_create' work.id %}" class="btn btn-success">Update</a>
+    <a href="{% url 'work:workcommit_list' work.id %}" class="btn btn-primary">History</a>
     <a href="{% url 'work:work_delete' work.id %}" class="btn btn-danger">Delete</a>
   </div>
 </div>
+{% show_chart chart %}
 {% endblock %}

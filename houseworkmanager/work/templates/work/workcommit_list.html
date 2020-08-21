@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<a href="{% url 'work:workcommit_create' work.pk %}" class='btn btn-primary w-100 stiky-top mt-1'>Create</a>
+
+<ul class='list-group list-group-flush m-1'>
+    {% for workcommit in workcommit_list %}
+        <a href="{{ workcommit.get_absolute_url }}" class='list-group-item row'>
+            <span class='col-3 d-inline-block p-0'>{{ workcommit.created_at }}</span>
+            <span class='col-6 d-inline-block'>{{ workcommit.name }}</span>
+            <span class='col-2 d-inline-block text-right p-0'>{{ workcommit.point }}</span>
+        </a>
+    {% endfor %}
+</ul>
+
+{% endblock %}

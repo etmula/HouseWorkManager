@@ -1,18 +1,65 @@
+from urllib.parse import urlencode
+
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, DetailView, DeleteView, ListView, UpdateView
 from django.forms import inlineformset_factory
 from django import forms
 
-from .models import Work, Category
+from .models import Work, Category, WorkCommit
 from accounts.models import Group
 from history.models import Recode
+from stats.Charts import ExecutionRatePieChart
+
+
+class WorkCommitCreateView(CreateView):
+    model = WorkCommit
+
+    fields = ('name', 'description', 'point')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        if work.head:
+            initial['name'] = work.head.name
+            initial['description'] = work.head.description
+            initial['point'] = work.head.point
+        return initial
+
+    def form_valid(self, form):
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        form.instance.work_id = work.id
+        work.head = form.instance
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        work.head = self.object
+        work.save()
+        return reverse('work:work_detail', kwargs={'pk': work.pk})
+
+
+class WorkCommitListView(ListView):
+    model = WorkCommit
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["work"] = Work.objects.get(pk=self.kwargs.get('pk'))
+        return context
+    
+    def get_queryset(self):
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        return WorkCommit.objects.filter(work=work)
+
+
+class WorkCommitDetailView(DetailView):
+    model = WorkCommit
 
 
 class WorkCreateView(CreateView):
     model = Work
 
-    fields = ('category', 'name', 'point', 'description', 'alert')
+    fields = ('category', 'alert')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
@@ -21,22 +68,23 @@ class WorkCreateView(CreateView):
         form.fields['category'] = forms.ModelChoiceField(queryset=queryset)
         return form
 
-    def get_form_kwargs(self, *args, **kwargs):
-        # print(super(CreateView, self).get_form_kwargs(*args, **kwargs))
-        kwargs = super(CreateView, self).get_form_kwargs(*args, **kwargs)
-        return kwargs
+    def get_success_url(self):
+        return reverse('work:workcommit_create', kwargs=dict(pk=self.get_form(self.form_class).instance.pk))
 
 
 class WorkDetailView(DetailView):
     model = Work
 
-'''
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
-        work_name = 
-        context['data'] = [for recode in Recode.objects.filter(name=self.request.)]
-        return context'''
+        chart = ExecutionRatePieChart(self.request.user.group)
+        print(self.kwargs.get('pk'))
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        print(work)
+        chart.build_table(work=work)
+        context["chart"] = chart
+        return context
+    
 
 
 class WorkDeleteView(DeleteView):
@@ -55,7 +103,7 @@ class WorkListView(ListView):
 class WorkUpdateView(UpdateView):
     model = Work
 
-    fields = ('category', 'name', 'point', 'description', 'alert')
+    fields = ('category', 'alert')
 
 
 class CategoryCreateView(CreateView):
@@ -82,11 +130,8 @@ class CategoryDeleteView(DeleteView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        print(self.kwargs['pk'])
         category = Category.objects.get(pk=self.kwargs['pk'])
-        print(category)
         context['work_list'] = category.works.all()
-        print(context['work_list'])
         return context
 
 
