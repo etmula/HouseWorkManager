@@ -1,9 +1,0 @@
-{% load static %}
-
-<!-- Head -->
-{{ score_user_data|json_script:"score_user_data"}}
-<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script src="{% static 'stats/js/score_user.js' %}"></script>
-
-<!-- Body-->
-<div id="curve_chart" style="width: 100%%; height: 100%"></div>
