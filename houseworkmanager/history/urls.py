@@ -8,6 +8,7 @@ urlpatterns = [
     path('recode/<int:pk>', views.RecodeDetailView.as_view(), name='recode_detail'),
     path('recode/create', views.RecodeCreateView.as_view(), name='recode_create'),
     path('recode/delete/<int:pk>', views.RecodeDeleteView.as_view(), name='recode_delete'),
-    path('recode/cancel/<int:pk>', views.RecodeCancel, name='recode_cancel'),
-    path('recode/monthly/<int:year>/<int:month>', views.RecodeListMonthlyView.as_view(), name='recode_monthly'),
+    path('report/<int:year>/<int:month>', views.RecodeListMonthlyView.as_view(), name='recode_list_monthly'),
+    path('report/point/<int:year>/<int:month>', views.RecodePointTableMonthlyView.as_view(), name='report_point_monthly'),
+    path('report/count/<int:year>/<int:month>', views.RecodeCountTableMonthlyView.as_view(), name='report_count_monthly'),
 ]

@@ -7,21 +7,22 @@
 {% block content %}
 <div class="card text-left m-1">
   <div class="card-header">
-      {{recode.updated_at}}に更新
+      {{recode.created_at}}に作成
   </div>
   <div class="card-body">
     <div class="card-title">
-      <h5>{{ recode.name }}</h5>
+      <h5>{{ recode.workcommit.name }}</h5>
     </div>
     <p class="card-text">
-      <p>カテゴリー: {{recode.category}}</p>
-      <p>得点: {{recode.point}}</p>
-      <p>実行者: {{recode.executer.username}}</p>
-      <p>実行日: {{recode.date}}</p>
+      <p>カテゴリー: {{recode.workcommit.work.category}}</p>
+      <p>得点: {{recode.workcommit.point}}</p>
+      <p>実行者: {% for executer in recode.executers %}{{executer.username}}, {% endfor %}</p>
+      <p>実行日: {{recode.exected_date}}</p>
     </p>
   </div>
   <div class="card-footer text-muted">
-    <a href="{% url 'history:recode_delete' recode.id %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'history:recode_delete' recode.id %}" class="btn btn-danger
+      {% if user in recode.executers %} disabled {% endif %}">Delete</a>
   </div>
 </div>
 {% endblock %}

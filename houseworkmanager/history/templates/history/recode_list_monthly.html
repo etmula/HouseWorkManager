@@ -8,16 +8,33 @@
 
 {% block content %}
 <a href="{% url 'history:recode_create'%}" class='btn btn-primary w-100 stiky-top m-1'>Create</a>
-<nav class="nav nav-pills nav-justified">
-  <a class="nav-item nav-link active" href="#">Active</a>
-  <a class="nav-item nav-link" href="#">{{ }}</a>
-  <a class="nav-item nav-link" href="#">Link</a>
+<nav class="nav nav-pills nav-justified m-1">
+  <a class="nav-item nav-link" href="{% url 'history:recode_list_monthly' before_date.year before_date.month%}">Before</a>
+  <a class="nav-item nav-link active" href="#">{{current_date.year }}/{{ current_date.month }}</a>
+  <a class="nav-item nav-link" href="{% url 'history:recode_list_monthly' next_date.year next_date.month%}">Next</a>
 </nav>
 <div id="curve_chart" style="width: 100%; height: 400px"></div>
+
+<table>
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">仕事名</th>
+      <th scope="col">合計点</th>
+      {% for user in users %}
+        <th scope="col">{{ user.username }}</th>
+      {% endfor %}
+      <th scope="col">合計回数</th>
+      
+    </tr>
+  </thead>
+</table>
+
+
 <ul class='list-group list-group-flush m-1'>
     {% for recode in recode_list %}
         <a href="{{ recode.get_absolute_url }}" class="list-group-item row">
-            <span class='col-3 d-inline-block p-0'>{{ recode.date|date:'y/m/d' }}</span>
+            <span class='col-3 d-inline-block p-0'>{{ recode.exected_date|date:'y/m/d' }}</span>
             <span class='col-2 d-inline-block p-0'>{{ recode.executer }}</span>
             <span class='col-5 d-inline-block'>{{ recode.name }}</span>
             <span class='col-1 d-inline-block text-right p-0'>{{ recode.point }}</span>
