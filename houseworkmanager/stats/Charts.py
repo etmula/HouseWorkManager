@@ -1,7 +1,9 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import datetime, timedelta, date
+import itertools
 
-from work.models import WorkCommit
+from work.models import WorkCommit, Work, Category
+from history.models import Recode
 
 
 class Chart(metaclass=ABCMeta):
@@ -39,7 +41,18 @@ class ExecutionRatePieChart(Chart):
         users = self.group.users
         table = [['username', 'ExecutionRate'],]
         for user in users.all():
-            row = [user.username, user.calc_work_count(work=work, startdate=startdate, enddate=enddate)]
+            workcommits = WorkCommit.objects.filter(
+                work=work
+            )
+            recodes = Recode.objects.filter(
+                group=self.group,
+                workcommit__in=workcommits
+            )
+            if startdate:
+                recodes = recodes.filter(exected_date__gte=startdate)
+            if enddate:
+                recodes = recodes.filter(exected_date__lte=enddate)
+            row = [user.username, len(recodes)]
             table.append(row)
         self.table = table
     
@@ -57,10 +70,25 @@ class NumberOfExecutionsBarChart(Chart):
     def build_table(self, startdate=None, enddate=None):
         users = self.group.users
         categorys = self.group.categorys
-        works = category.works
+        works = []
+        for category in self.group.categorys.all():
+            if category.works.all():
+                works.extend(category.works.all())
         table = [['work_name',] + [user.username for user in users.all()],]
-        for work in works.all():
-            row = [work.head.name,] + [user.calc_work_count(work=work, startdate=startdate, enddate=enddate) for user in users.all()]
+        for work in works:
+            row = [work.head.name,]
+            for user in users.all():
+                workcommits = WorkCommit.objects.filter(work=work)
+                recodes = Recode.objects.filter(
+                    group=self.group,
+                    workcommit__in=workcommits,
+                    executers=user
+                )
+                if startdate:
+                    recodes = recodes.filter(exected_date__gte=startdate)
+                if enddate:
+                    recodes = recodes.filter(exected_date__lte=enddate)
+                row.append(len(recodes))
             table.append(row)
         self.table = table
 
@@ -75,13 +103,18 @@ class ScoreIncreaseLineChart(Chart):
     def js_path(cls):
         return 'stats/js/line_chart.js'
 
-    def build_table(self, startdate=None, enddate=None):
+    def build_table(self, startdate, enddate):
         users = self.group.users
         table = [['date',] + [user.username for user in users.all()],]
         for i in range((enddate - startdate).days + 1):
             date = startdate + timedelta(days=i)
             row = [date.day,]
             for user in users.all():
+                row.append(user.calc_point(startdate=startdate, enddate=date))
+            table.append(row)
+        self.table = table
+
+
 class CategoryRatePieChart(Chart):
 
     @classmethod
