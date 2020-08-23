@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load charts %}
 {% block head %}
 
 {% endblock %}
@@ -13,14 +14,7 @@
     <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active bg-dark"></li>
     <li data-target="#carouselExampleIndicators" data-slide-to="1" class='bg-dark'></li>
   </ol>
-  <div class="carousel-inner">
-    <div class="carousel-item active pb-4">
-      {% include 'stats/score_user.html'%}
-    </div>
-    <div class="carousel-item pb-4">
-      {% include 'stats/work_exected.html'%}
-    </div>
-  </div>
+  {% show_chart chart %}
 
   <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -53,4 +47,5 @@
         </svg>
     </a>
 </div>
+
 {% endblock %}
