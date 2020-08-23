@@ -82,6 +82,51 @@ class ScoreIncreaseLineChart(Chart):
             date = startdate + timedelta(days=i)
             row = [date.day,]
             for user in users.all():
-                row.append(user.calc_work_point(work=work, startdate=startdate, enddate=date))
+class CategoryRatePieChart(Chart):
+
+    @classmethod
+    def title(cls):
+        return '各Categoryが実行された回数の割合'
+
+    @classmethod
+    def js_path(cls):
+        return 'stats/js/pie_chart.js'
+
+    def build_table(self, startdate=None, enddate=None):
+        users = self.group.users
+        table = [['category', 'ExecutionRate'],]
+        for category in self.group.categorys.all():
+            works = Work.objects.filter(category=category)
+            workcommits = []
+            for work in works:
+                workcommits.extend(work.commits.all())
+            recodes = Recode.objects.filter(
+                group=self.group,
+                workcommit__in=workcommits
+            )
+            if startdate:
+                recodes = recodes.filter(exected_date__gte=startdate)
+            if enddate:
+                recodes = recodes.filter(exected_date__lte=enddate)
+            row = [category.name, len(recodes)]
+            table.append(row)
+        self.table = table
+
+
+class WorkPointShiftLineChart(Chart):
+
+    @classmethod
+    def title(cls):
+        return 'WorkPointShiftLineChart'
+    
+    @classmethod
+    def js_path(cls):
+        return 'stats/js/line_chart.js'
+
+    def build_table(self, work):
+        workcommits = work.commits.order_by('created_at')
+        table = [['date', 'point'],]
+        for workcommit in workcommits.all():
+            row = [date(workcommit.created_at.year, workcommit.created_at.month, workcommit.created_at.day), workcommit.point]
             table.append(row)
         self.table = table
