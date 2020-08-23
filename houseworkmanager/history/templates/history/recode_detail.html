@@ -16,13 +16,13 @@
     <p class="card-text">
       <p>カテゴリー: {{recode.workcommit.work.category}}</p>
       <p>得点: {{recode.workcommit.point}}</p>
-      <p>実行者: {% for executer in recode.executers %}{{executer.username}}, {% endfor %}</p>
+      <p>実行者: {% for executer in recode.executers.all %}{{executer.username}}, {% endfor %}</p>
       <p>実行日: {{recode.exected_date}}</p>
     </p>
   </div>
   <div class="card-footer text-muted">
     <a href="{% url 'history:recode_delete' recode.id %}" class="btn btn-danger
-      {% if user in recode.executers %} disabled {% endif %}">Delete</a>
+      {% if not user in recode.executers.all %} disabled {% endif %}">Delete</a>
   </div>
 </div>
 {% endblock %}
