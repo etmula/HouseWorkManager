@@ -82,16 +82,21 @@ class RecodeListMonthlyView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        current_date = datetime(self.kwargs.get('year'), self.kwargs.get('month'), 1)
-        context['data'] = score_user_line(self.request.user.group.users.all(), current_date.year, current_date.month)
-        context['current_date'] = current_date
-        context['next_date'] = current_date + relativedelta(months=1)
-        context['before_date'] = current_date - relativedelta(months=1)
+        year = self.kwargs.get('year')
+        month = self.kwargs.get('month')
+        first_date = date(year, month, 1)
+        last_date = date(year, month, calendar.monthrange(year, month)[1])
+        context['first_date'] = first_date
+        context['next_date'] = first_date + relativedelta(months=1)
+        context['before_date'] = first_date - relativedelta(months=1)
+        chart = NumberOfExecutionsBarChart(self.request.user.group)
+        chart.build_table(startdate=first_date, enddate=last_date)
+        context['chart'] = chart
         return context
 
     def get_queryset(self):
         query_set = super().get_queryset()
-        query_set = query_set.filter(date__year=self.kwargs.get('year'), date__month=self.kwargs.get('month'))
+        query_set = query_set.filter(exected_date__year=self.kwargs.get('year'), exected_date__month=self.kwargs.get('month'))
         return query_set
 
     
