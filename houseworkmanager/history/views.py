@@ -1,4 +1,5 @@
-from datetime import datetime
+import calendar
+from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
 from django.shortcuts import render
@@ -8,6 +9,7 @@ from django.utils import timezone
 
 from .models import Recode
 from stats.table_generator import score_user_line
+from stats.Charts import NumberOfExecutionsBarChart
 
 
 class RecodeCreateView(CreateView):
@@ -38,12 +40,16 @@ class RecodeListView(ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        now = timezone.now()
-        context['data'] = score_user_line(self.request.user.group.users.all(), now.year, now.month)
+        chart = NumberOfExecutionsBarChart(self.request.user.group)
+        chart.build_table()
+        context['chart'] = chart
         return context
 
     def get_queryset(self):
-        return Recode.objects.filter(executer__in=self.request.user.group.users.all())
+        recodes = Recode.objects.filter(
+            group=self.request.user.group
+        ).order_by('created_at')
+        return recodes.all()
 
 
 class RecodePointTableMonthlyView(TemplateView):
