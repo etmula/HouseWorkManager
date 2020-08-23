@@ -184,20 +184,6 @@ class User(AbstractBaseUser, PermissionsMixin):
             points += recode.workcommit.point
         return points
 
-    def calc_work_count(self, work=None, startdate=None, enddate=None):
-        recodes = self.group.recodes.all()
-        print(self.group.recodes.all())
-        print(work)
-        if work:
-            recodes = recodes.filter(workcommit__in=work.commits.all())
-        print(recodes.all())
-        if startdate:
-            recodes = recodes.filter(exected_date__gte=startdate)
-        if enddate:
-            recodes = recodes.filter(exected_date__lte=enddate)
-
-        return len(recodes)
-
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
