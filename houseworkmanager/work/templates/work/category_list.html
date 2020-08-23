@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load charts %}
 
 {% block content %}
 <ul class="nav nav-pills nav-fill">
@@ -18,4 +19,6 @@
         </a>
     {% endfor %}
 </ul>
+
+{% show_chart chart %}
 {% endblock %}

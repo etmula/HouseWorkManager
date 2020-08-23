@@ -16,4 +16,14 @@
     <a href="{% url 'work:category_delete' category.id %}" class="btn btn-danger">Delete</a>
   </div>
 </div>
+
+<ul class='list-group list-group-flush m-1'>
+    {% for work in category.works.all %}
+        <a href="{{ work.get_absolute_url }}" class='list-group-item row'>
+            <span class='col-3 d-inline-block p-0'>{{ work.category.name }}</span>
+            <span class='col-6 d-inline-block'>{{ work.name }}</span>
+            <span class='col-2 d-inline-block text-right p-0'>{{ work.point }}</span>
+        </a>
+    {% endfor %}
+</ul>
 {% endblock %}

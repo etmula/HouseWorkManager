@@ -9,7 +9,7 @@ from django import forms
 from .models import Work, Category, WorkCommit
 from accounts.models import Group
 from history.models import Recode
-from stats.Charts import ExecutionRatePieChart
+from stats.Charts import ExecutionRatePieChart, CategoryRatePieChart, WorkPointShiftLineChart
 
 
 class WorkCommitCreateView(CreateView):
@@ -44,7 +44,11 @@ class WorkCommitListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["work"] = Work.objects.get(pk=self.kwargs.get('pk'))
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        chart = WorkPointShiftLineChart(self.request.user.group)
+        chart.build_table(work=work)
+        context["chart"] = chart
+        context["work"] = work
         return context
     
     def get_queryset(self):
@@ -78,9 +82,7 @@ class WorkDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         chart = ExecutionRatePieChart(self.request.user.group)
-        print(self.kwargs.get('pk'))
         work = Work.objects.get(pk=self.kwargs.get('pk'))
-        print(work)
         chart.build_table(work=work)
         context["chart"] = chart
         return context
@@ -139,8 +141,15 @@ class CategoryListView(ListView):
     model = Category
 
     def get_queryset(self):
-        # Category.objects.filter(group=)
-        return super().get_queryset()
+        categorys = Category.objects.filter(group=self.request.user.group)
+        return categorys
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        chart = CategoryRatePieChart(self.request.user.group)
+        chart.build_table()
+        context["chart"] = chart
+        return context
 
 
 class CategoryUpdateView(UpdateView):

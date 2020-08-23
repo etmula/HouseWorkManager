@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-
+{% load charts %}
 
 {% block content %}
 <a href="{% url 'work:workcommit_create' work.pk %}" class='btn btn-primary w-100 stiky-top mt-1'>Create</a>
-
+{% show_chart chart %}
 <ul class='list-group list-group-flush m-1'>
     {% for workcommit in workcommit_list %}
         <a href="{{ workcommit.get_absolute_url }}" class='list-group-item row'>
