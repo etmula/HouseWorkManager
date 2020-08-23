@@ -170,7 +170,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Return the short name for the user."""
         return self.first_name
 
-    def calc_work_point(self, startdate=None, enddate=None, work=None):    
+    def calc_point(self, startdate=None, enddate=None, work=None):    
         recodes = self.recodes
         if work:
             recodes = recodes.filter(workcommit__in=work.commits.all())
@@ -181,7 +181,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         points= 0
         for recode in recodes.all():
-            points += recode.point
+            points += recode.workcommit.point
         return points
 
     def calc_work_count(self, work=None, startdate=None, enddate=None):
