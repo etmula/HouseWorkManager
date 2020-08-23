@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
+from history.models import Recode
+
 
 class Category(models.Model):
     group = models.ForeignKey('accounts.Group', on_delete=models.CASCADE, related_name='categorys')
@@ -25,38 +27,18 @@ class Work(models.Model):
             return self.category.name
 
     def get_absolute_url(self):
+        print(self.head)
         if self.head:
-            return reverse("work:work_detail", kwargs={"pk": self.head.pk})
+            return reverse("work:work_detail", kwargs={"pk": self.pk})
         else:
-            return reverse('work:workcommmit_create', kwargs={'pk': self.pk})
+            return reverse('work:workcommit_create', kwargs={'pk': self.pk})
     
-    def make_exucution_rate_dict(self):
-        recodes = []
-        for commit in self.commits.all():
-            for recode in commit.recodes.all():
-                recodes.append(recode)
-        users = self.users
-        execution_rate_dict = {user.username:0 for user in self.category.group.users.all()}
-            
-        for recode in recodes:
-            for executer in recode.executers:
-                if executer in recode.execution_rate_dict.keys():
-                    execution_rate_dict[executer] += 1
-
-        return count_dict
-    
-    def build_execution_rate_table(self):
-        startdate = datetime(year, month, 1)
-        enddate = datetime(year, month, calendar.monthrange(year, month)[1])
-        users = self.users.all()
-        table = [['work_name',] + [user.username for user in users],]
-        point_dict = self.make_point_dict(startdate, enddate)
-        for key, value in point_dict.items():
-            row = [key.name,]
-            for user in users.all():
-                row.append(value[user.username])
-            table.append(row)
-        return table
+    def last_exected_date(self):
+        workcommits = self.commits.all()
+        last_recode = Recode.objects.filter(
+            workcommit__in=workcommits
+        ).order_by('exected_date').last()
+        return last_recode.exected_date
     
 
 class WorkCommit(models.Model):
