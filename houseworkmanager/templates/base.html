@@ -1,4 +1,8 @@
 {% load static %}
+{% now "Y" as current_year %}
+{% now "m" as current_month %}
+
+
 <!DOCTYPE html>
 <html style='touch-action: manipulation;'>
     <head>
@@ -26,15 +30,29 @@
             
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'exec:exec'%}">exec</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'history:recode_list'%}">history</a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'work:work_list'%}">work</a>
-                </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'exec:exec'%}">exec</a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'history:recode_list'%}">history</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">History</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'history:recode_list'%}">Total</a>
+                            <a class="dropdown-item" href="{% url 'history:recode_list_monthly' current_year current_month %}">Monthly</a>
+                        </div>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="{% url 'work:work_list'%}">work</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Work</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'work:category_list'%}">Category</a>
+                            <a class="dropdown-item" href="{% url 'work:work_list'%}">Work</a>
+                        </div>
+                    </li>
                 </ul>
                 <ul class="navbar-nav">
                 {% if user.is_authenticated %}

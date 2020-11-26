@@ -1,22 +1,23 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block head %}
+{% load accounts %}
 
+
+{% block head %}
 <!-- Bootstrap-datepicker -->
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ja.min.js"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
-
 <!-- jquery-cookie -->
 <script src="{% static 'exec/js/jquery.cookie.js' %}"></script>
-
 {% endblock %}
+
 
 {% block content %}
 {% csrf_token %}
 
 <!-- Users points-->
-{% include 'accounts/users_point_form.html'%}
+{% users_point_form user%}
 
 
 <input data-provide="datepicker" class="form-control datepicker m-1" type="text" name="date" value=""　placeholder="Date">
@@ -24,12 +25,12 @@
 <ul class='list-group list-group-flush'>
     {% for work in view.group.get_works %}
         <div class="list-group-item row pr-0 work" count=0
-            work-id='{{work.id}}' category='{{work.category.name}}' name='{{work.name}}' point='{{work.point}}' description='{{work.description}}' alert='{{work.alert}}'>
+            pk='{{work.id}}' category='{{work.category.name}}' name='{{work.head.name}}' point='{{work.head.point}}' description='{{work.head.description}}' alert='{{work.alert}}'>
             <a class='col-8 d-inline-block p-0 m-0 row show-work-modal text-primary' href='{{ work.get_absolute_url }}' 
               data-target='modal' data-target='#work-modal'>
                 <span class='col-2 d-inline-block px-0'>{{ work.category.name}}</span>
-                <span class="col-6 d-inline-block px-0">{{work.name}}</span>
-                <span class="col-2 d-inline-block px-0">{{work.point}}</span>
+                <span class="col-6 d-inline-block px-0">{{work.head.name}}</span>
+                <span class="col-2 d-inline-block px-0">{{work.head.point}}</span>
             </a>
             <div class="btn-group btn-group-sm col-3 p-0" role="group">
                 <button  class="btn btn-secondary counter" count='down'>-</button>
@@ -43,26 +44,6 @@
     <button class='btn btn-success shadow-sm presubmit-work  m-2' data-toggle='modal' data-target='#submit-modal'>
         Exec <span class="badge badge-light">0</span>
     </button>
-</div>
-
-
-<!-- Work Modal -->
-<div class="modal fade" id="work-detail-modal" tabindex="-1" role="dialog" aria-labelledby="workModalCenterTitle" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="workModalCenterTitle">仕事名</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        </div>
-        <div class="modal-body">
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
-        </div>
-    </div>
-    </div>
 </div>
 
 <!-- Submit Modal -->

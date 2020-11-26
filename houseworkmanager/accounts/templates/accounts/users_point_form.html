@@ -1,17 +1,33 @@
-<div id='User' class="btn-group w-100 stick-top" data-toggle="buttons">
-    {% for current_user in user.group.users.all %}
-        <label class='btn btn-light d-block text-left shadow-sm'>
-            <div class="custom-control custom-checkbox">
-                <input id="user_checkbox_{{ current_user.pk }}" name='user' 
-                    value='{{current_user.pk}}' type='checkbox' autocomplete='off' 
-                    class='align-items-center d-inline user custom-control-input' 
-                    {% ifequal current_user user%} checked {%endifequal%}
-                >
-                <label class="custom-control-label" for="user_checkbox_{{ current_user.pk}}">
-                    <p class='m-0'>{{ current_user.username }}</p>
-                    <p class='m-0'>{{ current_user.calc_point }}</p>
-                </label>
-            </div>
-        </label>
+<table class="table table-sm" id='users-point-form-table'>
+  <thead>
+    <tr>
+        <th scope="col">User</th>
+        <th scope="col">Total</th>
+        <th scope="col">Monthly</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in table %}
+        <tr>
+            <th scope='row'>
+                <div class="custom-control custom-checkbox">
+                    <input 
+                        type="checkbox" 
+                        class="custom-control-input executer-checkbox" 
+                        id="user_checkbox_{{ row.user.pk }}" 
+                        name="user"
+                        value="{{row.user.pk}}"
+                        autocomplete='off'
+                        {% ifequal row.user.username user.username%} checked {%endifequal%}
+                    >
+                    <label class="custom-control-label" for="user_checkbox_{{ row.user.pk }}">
+                        {{ row.user.username}}
+                    </label>
+                </div>
+            </th>
+            <td>{{ row.total_point }}</td>
+            <td>{{ row.monthly_point }}</td>
+        </tr>
     {% endfor %}
-</div>
+  </tbody>
+</table>

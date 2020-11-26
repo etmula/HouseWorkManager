@@ -5,7 +5,13 @@
 <div class="card text-left m-1">
   <div class="card-header">
     {{work.category.name}}
-    <span class="badge badge-info">{{ work.last_exected_date }}に実行</span>
+    <span class="badge badge-info">
+      {% if worl.last_exected_date %}
+        {{ work.last_exected_date }}に実行
+      {% else %}
+        未実行  
+      {% endif %}
+    </span>
   </div>
   <div class="card-body">
     <h5 class="card-title">{{ work.head.name}}</h5>
