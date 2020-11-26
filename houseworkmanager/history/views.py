@@ -48,7 +48,7 @@ class RecodeListView(ListView):
     def get_queryset(self):
         recodes = Recode.objects.filter(
             group=self.request.user.group
-        ).order_by('created_at')
+        ).order_by('-created_at')
         return recodes.all()
 
 
@@ -103,6 +103,7 @@ class RecodeListMonthlyView(ListView):
     def get_queryset(self):
         query_set = super().get_queryset()
         query_set = query_set.filter(exected_date__year=self.kwargs.get('year'), exected_date__month=self.kwargs.get('month'))
+        query_set = query_set.order_by('-exected_date')
         return query_set
 
     
