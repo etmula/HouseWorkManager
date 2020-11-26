@@ -7,7 +7,9 @@ from django.views.generic import TemplateView, ListView
 from django.utils.functional import cached_property
 from django.utils import timezone
 
+from accounts.models import User
 from history.models import Recode
+from work.models import Work
 from history.views import RecodeListView
 from work.views import WorkListView, CategoryListView
 from stats.table_generator import score_user_line, work_exected_column
@@ -21,18 +23,15 @@ class ExecView(TemplateView):
         json_str = request.body.decode('utf-8')
         json_data = json.loads(json_str)
         if 'works' in json_data:
-            executer = request.user
-            recodes = []
             for work in json_data['works']:
-                recode = Recode(
-                    executer=executer,
-                    date=work['date'],
-                    category=work['category'],
-                    name=work['name'],
-                    point=int(work['point'])
+                workcommit = Work.objects.get(pk=work['pk']).head
+                executers = User.objects.filter(pk__in=list(work['executers'])).all()
+                recode = Recode.objects.create(
+                    exected_date=work['exected_date'],
+                    workcommit=workcommit,
+                    group=request.user.group,
                 )
-                recodes.append(recode)
-            Recode.objects.bulk_create(recodes)
+                recode.executers.set(executers.all())
         return HttpResponse(reverse('exec:home'))
 
     @cached_property
@@ -58,15 +57,3 @@ class HomeView(TemplateView):
     @cached_property
     def group(self):
         return self.request.user.group
-
-
-class HistoryView(RecodeListView):
-    template_name = 'exec/history.html'
-
-
-class WorkView(WorkListView):
-    template_name = 'exec/work.html'
-
-
-class CategoryView(CategoryListView):
-    template_name = 'exec/category.html'
