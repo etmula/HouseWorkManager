@@ -1,1 +1,1 @@
-web: gunicorn houseworkmanager/houseworkmanager.wsgi --log-file -
+web: cd houseworkmanager; gunicorn houseworkmanager/houseworkmanager.wsgi --log-file -; cd ..
