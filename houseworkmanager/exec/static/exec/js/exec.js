@@ -10,10 +10,9 @@ class Work{
         let data = {'works': []}
         for(let work of works){
             data['works'].push({
-                'category': work.fields.category,
-                'name': work.fields.name,
-                'point': work.fields.point,
-                'date': work.fields.date
+                'pk': work.fields.pk,
+                'exected_date': work.fields.exected_date,
+                'executers': work.fields.executers
             })
         }
         $.ajax({
@@ -28,14 +27,19 @@ class Work{
     };
 
     static read_fields($element){
+        let executers = []
+        $("input.executer-checkbox[type='checkbox']:checked").each(function(index, element){
+            executers.push($(element).attr('value'))
+        });
         let fields = {
-            'id': $element.attr('work-id'),
+            'pk': $element.attr('pk'),
             'category': $element.attr('category'),
             'name': $element.attr('name'),
             'point': Number($element.attr('point')),
             'description': $element.attr('description'),
             'alert': Number($element.attr('alert')),
-            'date': submitter.$datepicker.val(),
+            'exected_date': submitter.$datepicker.val(),
+            'executers': executers
         };
         return fields
     }
@@ -87,6 +91,7 @@ class Submitter{
     pre_submit(){
         this.$submit_modal.find('.modal-body').find('.list-group').empty();
         let total_point = 0;
+        console.log(this.waiting_work_dict)
 
         for(let date in this.waiting_work_dict){
             this.$submit_modal.find('.modal-body').find('.list-group').append(
@@ -141,21 +146,34 @@ submitter.$datepicker.on('change', function(){
 
 //カウンター
 $('.counter').on('click', function(){
+    //対象のWork読み取り
+    let work = new Work(Work.read_fields($(this).closest('.work')))
+    console.log(work)
+
+    //waiting_work_dictに新たな辞書を追加
+    if(!(work.fields.exected_date in submitter.waiting_work_dict)){
+        submitter.waiting_work_dict[work.fields.exected_date] = {}
+    }
+    if(!(work.fields.pk in submitter.waiting_work_dict[work.fields.exected_date])){
+        submitter.waiting_work_dict[work.fields.exected_date][work.fields.pk] = []
+    }
+
+    //計算
     let term = 0;
     let count = $(this).attr('count');
-    let work = new Work(Work.read_fields($(this).closest('.work')))
-    if(!(work.fields.date in submitter.waiting_work_dict)){submitter.waiting_work_dict[work.fields.date] = {}}
-    if(!(work.fields.id in submitter.waiting_work_dict[work.fields.date])){submitter.waiting_work_dict[work.fields.date][work.fields.id] = []}
     if(count == 'up'){
         term = 1;
-        submitter.waiting_work_dict[work.fields.date][work.fields.id].push(work)
+        submitter.waiting_work_dict[work.fields.exected_date][work.fields.pk].push(work)
     }else if(count == 'down'){
         term = -1;
-        submitter.waiting_work_dict[work.fields.date][work.fields.id].pop();
+        submitter.waiting_work_dict[work.fields.exected_date][work.fields.pk].pop();
     }
+
+    //cookieに登録
     let waiting_work_dict_json = JSON.stringify(submitter.waiting_work_dict);
     $.cookie('waiting_work_dict_json', waiting_work_dict_json, {expires: 7});
 
+    //描画
     let this_count = Number($(this).parent().find('.count-label').text());
     this_count = Math.max(0, this_count + term);
     $(this).parent().find('.count-label').text(this_count);
