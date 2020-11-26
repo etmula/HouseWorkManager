@@ -12,6 +12,7 @@ from django.shortcuts import reverse
 
 from history.models import Recode
 
+
 class CustomUserManager(UserManager):
     use_in_migrations = True
 
@@ -56,12 +57,12 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse("accounts:group_detail", kwargs={"pk": self.pk})
-    
+
     def make_point_dict(self, startdate, enddate):
         recodes = Recode.objects.filter(group=self, exected_date__range=[startdate, enddate])
         users = self.users
         point_dict = {}
-        
+
         for recode in recodes:
             if not recode.workcommit in point_dict.keys():
                 point_dict[recode.workcommit] = {user.username:0 for user in users.all()}

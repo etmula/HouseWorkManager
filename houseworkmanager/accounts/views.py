@@ -26,11 +26,6 @@ class SignUpView(generic.CreateView):
     success_url = reverse_lazy('accounts:login')
     template_name = 'accounts/signup.html'
 
-    def form_valid(self, form):
-        group = Group.objects.create(name='self')
-        form.instance.group_id = group.id
-        return super().form_valid(form)
-
 
 class Login(LoginView):
     form_class = MyLoginForm
@@ -172,7 +167,7 @@ class UserUpdate(OnlyYouMixin, generic.UpdateView):
 
 class GroupUpdateView(OnlyYouMixin, generic.UpdateView):
     model = Group
-    
+
     fields = ('name',)
 
 
