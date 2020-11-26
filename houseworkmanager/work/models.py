@@ -27,7 +27,6 @@ class Work(models.Model):
             return self.category.name
 
     def get_absolute_url(self):
-        print(self.head)
         if self.head:
             return reverse("work:work_detail", kwargs={"pk": self.pk})
         else:
@@ -38,7 +37,10 @@ class Work(models.Model):
         last_recode = Recode.objects.filter(
             workcommit__in=workcommits
         ).order_by('exected_date').last()
-        return last_recode.exected_date
+        if last_recode:
+            return last_recode.exected_date
+        else:
+            return None
     
 
 class WorkCommit(models.Model):
