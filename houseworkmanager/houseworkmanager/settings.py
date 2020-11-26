@@ -12,20 +12,22 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 
 import os
 import environ
+
+import dj_database_url
 from django.urls import reverse
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
-env = environ.Env(
-    DEBUG=(bool, False)
-)
-env.read_env(os.path.join(BASE_DIR, '.env'))
 
-DEBUG = env('DEBUG')
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
-SECRET_KEY = env('SECRET_KEY')
+if not DEBUG:
+    SECRET_KEY = os.environ['SECRET_KEY']
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -61,6 +63,7 @@ MIDDLEWARE = [
     'login_required.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
@@ -96,8 +99,18 @@ WSGI_APPLICATION = 'houseworkmanager.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    'default': env.db()
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'name',
+        'USER': 'user',
+        'PASSWORD': '',
+        'HOST': 'host',
+        'PORT': '',
+    }
 }
+
+db_from_env = dj_database_url.config(conn_max_age=600, ssl_require=True)
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation
@@ -140,9 +153,14 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT = '/code/static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_URL = 'accounts:login'
 LOGIN_REDIRECT_URL = 'exec:home'
 
 AUTH_USER_MODEL = 'accounts.User'
+
+if not DEBUG:
+    SECRET_KEY = os.environ['SECRET_KEY']
+    import django_heroku #追加
+    django_heroku.settings(locals()) #追加
