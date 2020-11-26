@@ -15,6 +15,9 @@ uwsgi = "==2.0.17"
 django-login-required-middleware = "*"
 django-crispy-forms = "*"
 python-dateutil = "*"
+gunicorn = "*"
+django-heroku = "*"
+dj-database-url = "*"
 
 [requires]
 python_version = "3.7"
