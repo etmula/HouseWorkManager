@@ -34,9 +34,7 @@ INSTALLED_APPS = [
     'home.apps.HomeConfig',
     'stats.apps.StatsConfig',
     'work.apps.WorkConfig',
-    'history.apps.HistoryConfig',
     'accounts.apps.AccountsConfig',
-    'exec.apps.ExecConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -146,7 +144,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 LOGIN_URL = 'accounts:login'
-LOGIN_REDIRECT_URL = 'exec:home'
+LOGIN_REDIRECT_URL = 'home:home'
 
 AUTH_USER_MODEL = 'accounts.User'
 
