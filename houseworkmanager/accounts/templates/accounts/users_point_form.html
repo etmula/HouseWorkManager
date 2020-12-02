@@ -18,7 +18,7 @@
                         name="user"
                         value="{{row.user.pk}}"
                         autocomplete='off'
-                        {% ifequal row.user.username user.username%} checked {%endifequal%}
+                        {% ifequal row.user user%} checked {%endifequal%}
                     >
                     <label class="custom-control-label" for="user_checkbox_{{ row.user.pk }}">
                         {{ row.user.username}}

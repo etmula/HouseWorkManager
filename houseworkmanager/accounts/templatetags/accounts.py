@@ -40,11 +40,12 @@ def users_point_form(user, **kwargs):
         month = timezone.now().month
     startdate = date(year, month, 1)
     enddate = date(year, month, calendar.monthrange(year, month)[1])
-    table = []
-    for user in user.group.users.all():
-        table.append({
+    table = [
+        {
             'user': user,
             'total_point': user.calc_point(),
             'monthly_point': user.calc_point(startdate=startdate, enddate=enddate)
-        })
+        }
+        for user in user.group.users.all()
+    ]
     return {'table': table, 'user': user}
