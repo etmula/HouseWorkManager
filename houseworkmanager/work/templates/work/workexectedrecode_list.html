@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load charts %}
+
+
+{% block content %}
+<ul class='list-group list-group-flush m-1'>
+    {% for workexectedrecode in workexectedrecode_list %}
+        <a href="{{ workexectedrecode.get_absolute_url }}" class="list-group-item row">
+            <span class='col-3 d-inline-block p-0'>{{ workexectedrecode.exected_date|date:'y/m/d' }}</span>
+            <span class='col-2 d-inline-block p-0'>{% for executer in workexectedrecode.executers.all %}{{executer.username}},{%endfor%}</span>
+            <span class='col-5 d-inline-block'>{{ workexectedrecode.name }}</span>
+            <span class='col-1 d-inline-block text-right p-0'>{{ workexectedrecode.point }}</span>
+        </a>
+    {% endfor %}
+</ul>
+{% endblock %}

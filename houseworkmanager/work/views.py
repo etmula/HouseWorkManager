@@ -95,64 +95,64 @@ class WorkDeleteView(DeleteView):
     success_url = reverse_lazy('work:work_list')
 
 
-class WorkListView(ListView):
-    model = Work
+class WorkExectedRecodeListView(ListView):
+    model = WorkExectedRecode
 
     def get_queryset(self):   
-        return Work.objects.filter(category__in=self.request.user.group.categorys.all())
+        workexectedrecodes = WorkExectedRecode.objects.filter(
+            group=self.request.user.group
+        )
+        if 'pk' in self.kwargs:
+            work_id = int(self.kwargs['pk'])
+            workexectedrecodes = WorkExectedRecode.objects.filter(
+                work=Work.objects.get(id=work_id)
+            )
+        return workexectedrecodes.order_by('-created_at').all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        chart = NumberOfExecutionsBarChart(self.request.user.group)
+        chart.build_table()
+        context['chart'] = chart
+        return context
 
 
-class WorkUpdateView(UpdateView):
-    model = Work
+class WorkExectedRecodeCreateView(CreateView):
+    model = WorkExectedRecode
 
-    fields = ('category', 'alert')
+    fields = ('exected_date', 'executers', 'work', 'name', 'point',)
 
-
-class CategoryCreateView(CreateView):
-    model = Category
-
-    fields = ('name',)
-
-    success_url = reverse_lazy('work:category_list')
+    success_url = reverse_lazy('work:WorkExectedRecode_list')
 
     def form_valid(self, form):
         group = self.request.user.group
-        form.instance.group_id = group.id
+        form.instance.group = group
         return super().form_valid(form)
 
+    def post(self, request, *args, **kwargs):
+        data = json.loads(request.body)
+        executers = [int(user_id) for user_id in data["executers"]]
+        work = Work.objects.get(
+            group=request.user.group,
+            id=int(data["work"])
+        )
+        date = data["date"]
+        workexectedrecode = WorkExectedRecode.objects.create(
+            exected_date=date,
+            work=work,
+            group=request.user.group,
+            name=work.name,
+            point=work.point
+        )
+        workexectedrecode.executers.set(executers)
+        return JsonResponse({})
 
-class CategoryDetailView(DetailView):
-    model = Category
-
-
-class CategoryDeleteView(DeleteView):
-    model = Category
-
-    success_url = reverse_lazy('work:category_list')
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        category = Category.objects.get(pk=self.kwargs['pk'])
-        context['work_list'] = category.works.all()
-        return context
-
-
-class CategoryListView(ListView):
-    model = Category
-
-    def get_queryset(self):
-        categorys = Category.objects.filter(group=self.request.user.group)
-        return categorys
     
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        chart = CategoryRatePieChart(self.request.user.group)
-        chart.build_table()
-        context["chart"] = chart
-        return context
+class WorkExectedRecodeDetailView(DetailView):
+    model = WorkExectedRecode
 
 
-class CategoryUpdateView(UpdateView):
-    model = Category
+class WorkExectedRecodeDeleteView(DeleteView):
+    model = WorkExectedRecode
 
-    fields = ('name',)
+    success_url = reverse_lazy('work:WorkExectedRecode_list')
