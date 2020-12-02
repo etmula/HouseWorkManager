@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Delete {{ work.name }}</h1>
-<form class="" method="post">
+<div class="alert alert-danger m-1" role="alert">
+  <h4 class="alert-heading mb-3">Comfirm to delete{{ workexectedrecode.name }}</h4>
+  <form class="" method="post">
     {% csrf_token %}
     <input type="submit" class="btn btn-danger" value="Delete">
     <a href="{% url 'work:work_detail' pk=work.pk %}">Cancel</a>
 </form>
+</div>
 {% endblock %}

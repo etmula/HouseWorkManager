@@ -1,47 +1,85 @@
+from collections import deque
+
 from django.db import models
 from django.urls import reverse
+from django.utils.timezone import localdate
 
-from history.models import Recode
 
-
-class Category(models.Model):
-    group = models.ForeignKey('accounts.Group', on_delete=models.CASCADE, related_name='categorys')
+class Composite(models.Model):
+    group = models.ForeignKey(
+        'accounts.Group',
+        on_delete=models.CASCADE,
+        related_name='composites'
+    )
     name = models.CharField(max_length=20)
+    parent = models.ForeignKey(
+        'Composite',
+        on_delete=models.CASCADE,
+        related_name='composites',
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
-        return f'{self.name}'
+        if self.parent:
+            return f'{self.parent.__str__()}/{self.name}'
+        else:
+            return self.name
 
     def get_absolute_url(self):
-        return reverse("work:category_detail", kwargs={"pk": self.pk})
+        return reverse("work:composite_list", kwargs={'pk': self.id})
+
+    def get_parents(self):
+        path_list = deque()
+        composite = self
+        while composite.parent:
+            path_list.appendleft(composite.parent)
+            composite = composite.parent
+        return path_list
 
 
 class Work(models.Model):
-    category = models.ForeignKey('Category', on_delete=models.CASCADE, related_name='works')
-    head = models.ForeignKey('WorkCommit', on_delete=models.PROTECT, related_name='work_set', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    group = models.ForeignKey(
+        'accounts.Group',
+        on_delete=models.CASCADE,
+        related_name='works'
+    )
+    parent = models.ForeignKey(
+        'Composite',
+        on_delete=models.CASCADE,
+        related_name='works',
+        null=True,
+        blank=True
+    )
+    name = models.CharField(max_length=30)
+    point = models.IntegerField(default=0)
+    description = models.TextField(blank=True, max_length=1000)
     alert = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
-        if self.head:
-            return self.head.name
-        else:
-            return self.category.name
+        return self.name
+
+    def save(self, **kwargs):
+        try:
+            if self.point != Work.objects.get(id=self.id).point:
+                WorkUpdatedRecode.objects.create(
+                        updated_at=self.updated_at,
+                        work=self,
+                        name=self.name,
+                        point=self.point
+                    )
+        except Work.DoesNotExist:
+            pass
+        return super(Work, self).save(**kwargs)
 
     def get_absolute_url(self):
-        if self.head:
-            return reverse("work:work_detail", kwargs={"pk": self.pk})
-        else:
-            return reverse('work:workcommit_create', kwargs={'pk': self.pk})
-    
-    def last_exected_date(self):
-        workcommits = self.commits.all()
-        last_recode = Recode.objects.filter(
-            workcommit__in=workcommits
-        ).order_by('exected_date').last()
-        if last_recode:
-            return last_recode.exected_date
-        else:
-            return None
-    
+        return reverse("work:work_detail", kwargs={"pk": self.pk})
+
+    def get_latest_exected(self):
+        return self.workexectedrecodes.latest('exected_date')
+
 
 class WorkExectedRecode(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

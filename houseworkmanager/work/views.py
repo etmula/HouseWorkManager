@@ -1,79 +1,176 @@
-from urllib.parse import urlencode
+import json
 
-from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, DetailView, DeleteView, ListView, UpdateView
-from django.forms import inlineformset_factory
+from django.views.generic import CreateView, DetailView, \
+    DeleteView, ListView, UpdateView, TemplateView
 from django import forms
+from django.http.response import JsonResponse
 
-from .models import Work, Category, WorkCommit
-from accounts.models import Group
-from history.models import Recode
-from stats.Charts import ExecutionRatePieChart, CategoryRatePieChart, WorkPointShiftLineChart
-
-
-class WorkCommitCreateView(CreateView):
-    model = WorkCommit
-
-    fields = ('name', 'description', 'point')
-
-    def get_initial(self):
-        initial = super().get_initial()
-        work = Work.objects.get(pk=self.kwargs.get('pk'))
-        if work.head:
-            initial['name'] = work.head.name
-            initial['description'] = work.head.description
-            initial['point'] = work.head.point
-        return initial
-
-    def form_valid(self, form):
-        work = Work.objects.get(pk=self.kwargs.get('pk'))
-        form.instance.work_id = work.id
-        work.head = form.instance
-        return super().form_valid(form)
-    
-    def get_success_url(self):
-        work = Work.objects.get(pk=self.kwargs.get('pk'))
-        work.head = self.object
-        work.save()
-        return reverse('work:work_detail', kwargs={'pk': work.pk})
+from .models import Composite, Work, WorkExectedRecode
+from stats.Charts import ExecutionRatePieChart, CategoryRatePieChart,\
+    WorkPointShiftLineChart, NumberOfExecutionsBarChart
 
 
-class WorkCommitListView(ListView):
-    model = WorkCommit
+class CompositeListView(TemplateView):
+    template_name = 'work/composite_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        work = Work.objects.get(pk=self.kwargs.get('pk'))
-        chart = WorkPointShiftLineChart(self.request.user.group)
-        chart.build_table(work=work)
-        context["chart"] = chart
-        context["work"] = work
+        composite_id = int(kwargs['pk'])
+        if composite_id:
+            parent = Composite.objects.get(
+                group=self.request.user.group,
+                id=composite_id
+            )
+        else:
+            parent = None
+        composites = Composite.objects.filter(
+            group=self.request.user.group,
+            parent=parent
+        )
+        works = Work.objects.filter(
+            group=self.request.user.group,
+            parent=parent
+        )
+
+        context['composite_list'] = composites.all()
+        context['work_list'] = works.all()
+        context['parent'] = parent
         return context
-    
-    def get_queryset(self):
-        work = Work.objects.get(pk=self.kwargs.get('pk'))
-        return WorkCommit.objects.filter(work=work)
 
 
-class WorkCommitDetailView(DetailView):
-    model = WorkCommit
+class CompositeCreateView(CreateView):
+    model = Composite
+
+    fields = ('parent', 'name',)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['parent'] = forms.ModelChoiceField(
+            queryset=Composite.objects.filter(
+                group=self.request.user.group
+            ),
+            required=False
+        )
+        return form
+
+    def get_initial(self):
+        initial = super().get_initial()
+        composite_id = int(self.kwargs['pk'])
+        if composite_id:
+            initial["parent"] = Composite.objects.get(
+                group=self.request.user.group,
+                id=composite_id
+            )
+        return initial
+
+    def form_valid(self, form):
+        form.instance.group_id = self.request.user.group.id
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse(
+            'work:composite_list',
+            kwargs=dict(pk=self.get_form(self.form_class).instance.pk)
+        )
+
+
+class CompositeDeleteView(DeleteView):
+    model = Composite
+
+    def get_success_url(self):
+        if self.object.parent:
+            success_url = reverse_lazy('work:composite_detail', self.object.parent.id)
+        else:
+            success_url = reverse_lazy('work:composite_list')
+        return success_url
+
+
+class CompositeUpdateView(UpdateView):
+    model = Composite
+
+    fields = ('parent', 'name',)
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['parent'] = forms.ModelChoiceField(
+            queryset=Composite.objects.filter(
+                group=self.request.user.group
+            ),
+            required=False
+        )
+        return form
+
+    def get_initial(self):
+        initial = super().get_initial()
+        composite_id = int(self.kwargs['pk'])
+        if composite_id:
+            composite = Composite.objects.get(
+                group=self.request.user.group,
+                id=composite_id
+            )
+            initial["parent"] = composite.parent
+        return initial
+
+    def form_valid(self, form):
+        form.instance.group_id = self.request.user.group.id
+        return super().form_valid(form)
 
 
 class WorkCreateView(CreateView):
     model = Work
 
-    fields = ('category', 'alert')
+    fields = ('parent', 'name', 'point', 'description', 'alert')
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
-        user = self.request.user
-        queryset = Category.objects.filter(group=user.group)
-        form.fields['category'] = forms.ModelChoiceField(queryset=queryset)
+        form.fields['parent'] = forms.ModelChoiceField(
+            queryset=Composite.objects.filter(
+                group=self.request.user.group
+            ),
+            required=False
+        )
         return form
 
+    def get_initial(self):
+        initial = super().get_initial()
+        composite_id = int(self.kwargs['pk'])
+        if composite_id:
+            initial["parent"] = Composite.objects.get(
+                group=self.request.user.group,
+                id=composite_id
+            )
+        return initial
+
+    def form_valid(self, form):
+        form.instance.group_id = self.request.user.group.id
+        return super().form_valid(form)
+
     def get_success_url(self):
-        return reverse('work:workcommit_create', kwargs=dict(pk=self.get_form(self.form_class).instance.pk))
+        return reverse(
+            'work:work_detail',
+            kwargs=dict(pk=self.get_form(self.form_class).instance.pk)
+        )
+
+
+class WorkUpdateView(UpdateView):
+    model = Work
+
+    fields = ('parent', 'name', 'point', 'description', 'alert')
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class=form_class)
+        form.fields['parent'] = forms.ModelChoiceField(
+            queryset=Composite.objects.filter(
+                group=self.request.user.group
+            ),
+            required=False
+        )
+        return form
+
+    def form_valid(self, form):
+        form.instance.group_id = self.request.user.group.id
+        return super().form_valid(form)
 
 
 class WorkDetailView(DetailView):
@@ -86,19 +183,23 @@ class WorkDetailView(DetailView):
         chart.build_table(work=work)
         context["chart"] = chart
         return context
-    
 
 
 class WorkDeleteView(DeleteView):
     model = Work
 
-    success_url = reverse_lazy('work:work_list')
+    def get_success_url(self):
+        if self.object.parent:
+            success_url = reverse_lazy('work:composite_detail', self.object.parent.id)
+        else:
+            success_url = reverse_lazy('work:composite_list')
+        return success_url
 
 
 class WorkExectedRecodeListView(ListView):
     model = WorkExectedRecode
 
-    def get_queryset(self):   
+    def get_queryset(self):
         workexectedrecodes = WorkExectedRecode.objects.filter(
             group=self.request.user.group
         )
@@ -147,7 +248,7 @@ class WorkExectedRecodeCreateView(CreateView):
         workexectedrecode.executers.set(executers)
         return JsonResponse({})
 
-    
+
 class WorkExectedRecodeDetailView(DetailView):
     model = WorkExectedRecode
 

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load charts %}
+
+{% block content %}
+<a href="" class='btn btn-primary w-100 stiky-top mt-1'>Create</a>
+
+<ul class='list-group list-group-flush m-1'>
+    {% for item in item_list %}
+        <a href="{{ item.get_absolute_url }}" class='list-group-item row'>
+            <span class='col d-inline-block'>{{ item.name }}</span>
+        </a>
+    {% endfor %}
+</ul>
+
+{% endblock %}
