@@ -9,16 +9,11 @@ flake8 = "*"
 mypy = "*"
 
 [packages]
-django = "==2.2.8"
-django-environ = "*"
+django = ">=2"
 psycopg2 = ">=2.7,<3.0"
 uwsgi = "==2.0.17"
 django-login-required-middleware = "*"
 django-crispy-forms = "*"
-python-dateutil = "*"
-gunicorn = "*"
-django-heroku = "*"
-dj-database-url = "*"
 whitenoise = "*"
 
 [requires]
