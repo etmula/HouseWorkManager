@@ -1,4 +1,4 @@
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView,
@@ -151,6 +151,25 @@ class OnlyYouMixin(UserPassesTestMixin):
         return user.pk == self.kwargs['pk'] or user.is_superuser
 
 
+class OnlyNotMemberMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        return not self.request.user.group
+
+class OnlyMemberMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        return self.request.user in self.request.user.group.users
+
+class OnlyOwnerMixin(UserPassesTestMixin):
+    raise_exception = True
+
+    def test_func(self):
+        return self.request.user == self.request.user.group.owner
+
+
 class UserDetail(OnlyYouMixin, generic.DetailView):
     model = User
     template_name = 'accounts/user_detail.html'
@@ -165,14 +184,60 @@ class UserUpdate(OnlyYouMixin, generic.UpdateView):
         return resolve_url('accounts:user_detail', pk=self.kwargs['pk'])
 
 
-class GroupUpdateView(OnlyYouMixin, generic.UpdateView):
+class GroupCreateView(OnlyNotMemberMixin, generic.CreateView):
     model = Group
 
     fields = ('name',)
 
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        self.request.user.group = form.instance
+        return super().form_valid(form)
 
-class GroupDetailView(OnlyYouMixin, generic.DetailView):
+    def get_success_url(self):
+        return reverse(
+            'accounts:user_detail',
+            kwargs=dict(pk=self.get_form(self.form_class).instance.pk)
+        )
+
+
+class GroupUpdateView(OnlyOwnerMixin, generic.UpdateView):
     model = Group
+
+    fields = ('name', 'users')
+
+
+class GroupDetailView(OnlyMemberMixin, generic.DetailView):
+    model = Group
+
+
+class GroupInviteView(OnlyOwnerMixin, generic.DetailView):
+    model = Group
+    template_name = 'accounts/group_invite.html'
+
+
+class GroupQuitConfirmView(OnlyMemberMixin, generic.DetailView):
+    model = Group
+    template_name = 'accounts/group_quit_confirm.html'
+
+
+class GroupQuitDoneView(OnlyNotMemberMixin, generic.DetailView):
+    model = Group
+    template_name = 'accounts/group_quit_done.html'
+
+
+class GroupJoinRequestConfirmView(OnlyNotMemberMixin, generic.DetailView):
+    model = Group
+    template_name = 'accounts/group_join_request_confirm.html'
+
+class GroupJoinRequestDoneView(OnlyNotMemberMixin, generic.DetailView):
+    model = Group
+    template_name = 'accounts/group_join_request_done.html'
+
+
+class GroupJoinAcceptView(OnlyOwnerMixin, generic.TemplateView):
+    model = Group
+    template_name = 'accounts/group_join_accept.html'
 
 
 class SettingView(OnlyYouMixin, generic.DetailView):

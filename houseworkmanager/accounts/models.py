@@ -45,6 +45,11 @@ class CustomUserManager(UserManager):
 
 class Group(models.Model):
     name = models.CharField(max_length=50)
+    owner = models.OneToOneField(
+        'User',
+        related_name='own_group',
+        on_delete=models.PROTECT,
+    )
 
     def __str__(self):
         return self.name

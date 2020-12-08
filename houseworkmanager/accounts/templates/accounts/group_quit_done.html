@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-left">
+  <div class="card-header">
+    Done
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">Quit from Group {{ group.name}}</h5>
+  </div>
+  <div class="card-footer text-muted">
+    <a href="{% url 'accounts:group_update' group.id %}" class="btn btn-danger">Quit</a>
+  </div>
+</div>
+{% endblock %}
