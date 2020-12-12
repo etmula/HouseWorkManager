@@ -61,19 +61,6 @@ class Work(models.Model):
     def __str__(self):
         return self.name
 
-    def save(self, **kwargs):
-        try:
-            if self.point != Work.objects.get(id=self.id).point:
-                WorkUpdatedRecode.objects.create(
-                        updated_at=self.updated_at,
-                        work=self,
-                        name=self.name,
-                        point=self.point
-                    )
-        except Work.DoesNotExist:
-            pass
-        return super(Work, self).save(**kwargs)
-
     def get_absolute_url(self):
         return reverse("work:work_detail", kwargs={"pk": self.pk})
 

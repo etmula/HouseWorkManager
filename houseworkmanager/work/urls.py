@@ -3,6 +3,7 @@ from . import views
 
 app_name = 'work'
 urlpatterns = [
+    path('history/<int:pk>', views.HistoryView.as_view(), name='history'),
     path('composites/<int:pk>', views.CompositeListView.as_view(), name='composite_list'),
     path('composites/<int:pk>/create', views.CompositeCreateView.as_view(), name='composite_create'),
     path('composites/update/<int:pk>', views.CompositeUpdateView.as_view(), name='composite_update'),

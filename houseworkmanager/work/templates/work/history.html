@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load charts %}
+
+
+{% block content %}
+<div class="row m-0 p-2">
+    <div class="col-12 p-0">
+        <div class="card text-left m-1">
+            <div class="card-body">
+                {% show_chart score_increase_chart %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 p-0">
+        <div class="card text-left m-1">
+            <div class="card-body">
+                {% show_chart execution_chart %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 p-0">
+        <div class="card text-left m-1">
+            <div class="card-body">
+            {% show_chart score_pie_chart%}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 p-0">
+        <div class="card text-left m-1">
+            <div class="card-header">
+                実行履歴
+            </div>
+            <div class="card-body">
+                <ul class='list-group list-group-flush'>
+                    {% for workexectedrecode in group.workexectedrecodes.all|dictsortreversed:"exected_date"|slice:":5" %}
+                        <a href="{{ workexectedrecode.get_absolute_url }}" class="list-group-item row w-100 p-0">
+                            <span class='col-3 d-inline-block'>{{ workexectedrecode.exected_date|date:'y/m/d' }}</span>
+                            <span class='col-2 d-inline-block'>{% for executer in workexectedrecode.executers.all %}{{executer.username}},{%endfor%}</span>
+                            <span class='col-5 d-inline-block'>{{ workexectedrecode.name }}</span>
+                            <span class='col-1 d-inline-block text-right'>{{ workexectedrecode.point }}</span>
+                        </a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

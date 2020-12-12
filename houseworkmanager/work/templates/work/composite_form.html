@@ -1,20 +1,21 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-
-<div class="m-2">
-    <h2>
+<div class="card text-left m-2">
+    <div class="card-header">
         {% if not form.instance.pk %}
         Create Folder
         {% else %}
         Update Folder
         {% endif %}
-    </h2>
-    
-    <form class="" method="post">
+    </div>
+    <div class="card-body">
+        <form class="" method="post">
         {% csrf_token %}
         {{ form|crispy }}
-        <input type="submit" class="btn btn-primary mb-3" value="submit">
+        <hr>
+        <button type="submit" class="btn btn-success btn-lg btn-block">Create</button>
     </form>
+    </div>
 </div>
 {% endblock %}

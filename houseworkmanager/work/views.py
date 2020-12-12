@@ -1,14 +1,18 @@
 import json
+from datetime import datetime
 
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, DetailView, \
     DeleteView, ListView, UpdateView, TemplateView
 from django import forms
 from django.http.response import JsonResponse
+from django.utils import timezone
 
-from .models import Composite, Work, WorkExectedRecode
-from stats.Charts import ExecutionRatePieChart, CategoryRatePieChart,\
-    WorkPointShiftLineChart, NumberOfExecutionsBarChart
+
+from accounts.models import Group
+from .models import Composite, Work, WorkExectedRecode, WorkUpdatedRecode
+from stats.Charts import ExecutionRatePieChart, ScorePieChart,\
+    WorkPointShiftLineChart, NumberOfExecutionsBarChart, ScoreIncreaseLineChart
 
 
 class CompositeListView(TemplateView):
@@ -144,6 +148,16 @@ class WorkCreateView(CreateView):
 
     def form_valid(self, form):
         form.instance.group_id = self.request.user.group.id
+        try:
+            if self.point != Work.objects.get(id=self.id).point:
+                WorkUpdatedRecode.objects.create(
+                        updated_at=self.updated_at,
+                        work=self,
+                        name=self.name,
+                        point=self.point
+                    )
+        except Work.DoesNotExist:
+            pass
         return super().form_valid(form)
 
     def get_success_url(self):
@@ -158,6 +172,14 @@ class WorkUpdateView(UpdateView):
 
     fields = ('parent', 'name', 'point', 'description', 'alert')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        chart = WorkPointShiftLineChart(self.request.user.group, 'executionrate')
+        work = Work.objects.get(pk=self.kwargs.get('pk'))
+        chart.build_table(work=work)
+        context["chart"] = chart
+        return context
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class=form_class)
         form.fields['parent'] = forms.ModelChoiceField(
@@ -170,19 +192,21 @@ class WorkUpdateView(UpdateView):
 
     def form_valid(self, form):
         form.instance.group_id = self.request.user.group.id
+        try:
+            if form.instance.point != Work.objects.get(id=form.instance.id).point:
+                WorkUpdatedRecode.objects.create(
+                        updated_at=form.instance.updated_at,
+                        work=form.instance,
+                        name=form.instance.name,
+                        point=form.instance.point
+                    )
+        except Work.DoesNotExist:
+            pass
         return super().form_valid(form)
 
 
 class WorkDetailView(DetailView):
     model = Work
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        chart = ExecutionRatePieChart(self.request.user.group)
-        work = Work.objects.get(pk=self.kwargs.get('pk'))
-        chart.build_table(work=work)
-        context["chart"] = chart
-        return context
 
 
 class WorkDeleteView(DeleteView):
@@ -196,6 +220,26 @@ class WorkDeleteView(DeleteView):
         return success_url
 
 
+class HistoryView(DetailView):
+    model = Group
+    template_name = 'work/history.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        execution_chart = NumberOfExecutionsBarChart(self.request.user.group, 'execution_chart')
+        score_increase_chart = ScoreIncreaseLineChart(self.request.user.group, 'score_increase_chart')
+        score_pie_chart = ScorePieChart(self.request.user.group, 'score_pie_chart')
+        execution_chart.build_table()
+        now = timezone.now()
+        startdate = datetime(now.year, now.month, 1)
+        enddate = datetime(now.year, now.month, now.day)
+        score_increase_chart.build_table(startdate, enddate)
+        score_pie_chart.build_table()
+        context['execution_chart'] = execution_chart
+        context['score_increase_chart'] = score_increase_chart
+        context['score_pie_chart'] = score_pie_chart
+        return context
+
 class WorkExectedRecodeListView(ListView):
     model = WorkExectedRecode
 
@@ -205,16 +249,20 @@ class WorkExectedRecodeListView(ListView):
         )
         if 'pk' in self.kwargs:
             work_id = int(self.kwargs['pk'])
-            workexectedrecodes = WorkExectedRecode.objects.filter(
+            workexectedrecodes = workexectedrecodes.filter(
                 work=Work.objects.get(id=work_id)
             )
         return workexectedrecodes.order_by('-created_at').all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        chart = NumberOfExecutionsBarChart(self.request.user.group)
-        chart.build_table()
-        context['chart'] = chart
+        score_increase_chart = WorkPointShiftLineChart(self.request.user.group, 'score_increase_chart')
+        work = Work.objects.get(id=self.kwargs['pk'])
+        score_increase_chart.build_table(work=work)
+        context['score_increase_chart'] = score_increase_chart
+        pie_chart = ExecutionRatePieChart(self.request.user.group, 'pie_chart')
+        pie_chart.build_table(work=work)
+        context['pie_chart'] = pie_chart
         return context
 
 

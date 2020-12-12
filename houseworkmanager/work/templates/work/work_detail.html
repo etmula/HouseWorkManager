@@ -27,10 +27,9 @@
     {% if work.id %}
       <a href="{% url 'work:work_workexectedrecode_list' work.id %}" class="btn btn-primary">History</a>
     {% else %}
-      <a href="{% url 'work:work_workexectedrecode_list' 0 %}" class="btn btn-primary">History</a>
+      <a href="{% url 'work:work_workexectedrecode_list' work.id %}" class="btn btn-primary">History</a>
     {% endif %}
     <a href="{% url 'work:work_delete' work.id %}" class="btn btn-danger">Delete</a>
   </div>
 </div>
-{% show_chart chart %}
 {% endblock %}
