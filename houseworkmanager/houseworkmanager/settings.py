@@ -58,6 +58,8 @@ LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
     'accounts:signup',
     'admin:index',
     'admin:login',
+    'accounts:group_join_request_confirm',
+    'home:home'
 ]
 
 ROOT_URLCONF = 'houseworkmanager.urls'
