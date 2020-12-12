@@ -6,6 +6,7 @@ register = template.Library()
 @register.inclusion_tag('stats/chart.html')
 def show_chart(chart):
     chart_dict = {
+        'id': chart.id,
         'table': chart.table,
         'title': chart.title(),
         'js_path': chart.js_path()

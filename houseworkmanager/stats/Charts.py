@@ -7,7 +7,8 @@ from work.models import Work, WorkExectedRecode
 
 class Chart(metaclass=ABCMeta):
 
-    def __init__(self, group):
+    def __init__(self, group, ID):
+        self.id = ID
         self.group = group
         self.table = None
 
@@ -101,9 +102,9 @@ class ScoreIncreaseLineChart(Chart):
 
     def build_table(self, startdate, enddate):
         table = [
-            ['date', ] + [user.username for user in self.group.users.all()] +
-            [
-                ['date', ]+[
+            ['date', ] + [user.username for user in self.group.users.all()]
+            ] + [
+                [f'{i}', ]+[
                     user.calc_point(
                         startdate=startdate,
                         enddate=startdate+timedelta(days=i)
@@ -112,15 +113,14 @@ class ScoreIncreaseLineChart(Chart):
                 ]
                 for i in range((enddate - startdate).days + 1)
             ]
-        ]
         self.table = table
 
 
-class CategoryRatePieChart(Chart):
+class ScorePieChart(Chart):
 
     @classmethod
     def title(cls):
-        return '各Categoryが実行された回数の割合'
+        return '点数の割合'
 
     @classmethod
     def js_path(cls):
@@ -129,16 +129,10 @@ class CategoryRatePieChart(Chart):
     def build_table(self, startdate=None, enddate=None):
         '''各Categoryが実行された回数の割合
         '''
-        table = [['category', 'ExecutionRate'], ]
-        for category in self.group.categorys.all():
-            recodes = self.group.workexectedrecodes.filter(
-                work__in=category.works.all()
-            )
-            if startdate:
-                recodes = recodes.filter(exected_date__gte=startdate)
-            if enddate:
-                recodes = recodes.filter(exected_date__lte=enddate)
-            row = [category.name, len(recodes)]
+        table = [['User', 'ExecutionRate'], ]
+        for user in self.group.users.all():
+            score = user.calc_point(startdate, enddate)
+            row = [user.username, score]
             table.append(row)
         self.table = table
 
@@ -154,11 +148,10 @@ class WorkPointShiftLineChart(Chart):
         return 'stats/js/line_chart.js'
 
     def build_table(self, work):
-        table = [
-            ['date', 'point'] +
+        table = [['date', 'point']] +\
             [
                 [recode.updated_at, recode.point]
-                for recode in work.workupdatedrecodes
+                for recode in work.workupdatedrecodes.all()
             ]
-        ]
+        print(table)
         self.table = table

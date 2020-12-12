@@ -1,9 +1,9 @@
-var chart_dict = JSON.parse(document.getElementById('chart_dict').textContent);
-
-google.charts.load('current', {'packages':['corechart']});
+google.charts.load("current", {packages:['corechart']});
 google.charts.setOnLoadCallback(drawChart);
 
 function drawChart() {
+  var chart_dict = JSON.parse(document.getElementById('chart_dict').textContent);
+  document.getElementById('chart_dict').remove()
   var data = google.visualization.arrayToDataTable(chart_dict.table);
 
   var options = {
@@ -11,7 +11,7 @@ function drawChart() {
     legend:{position: 'top' },
   };
 
-  var chart = new google.visualization.LineChart(document.getElementById('chart'));
+  var chart = new google.visualization.LineChart(document.getElementById(chart_dict.id));
 
   chart.draw(data, options);
 }
