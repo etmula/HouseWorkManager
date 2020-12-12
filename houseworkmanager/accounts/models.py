@@ -131,6 +131,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username_validator = UnicodeUsernameValidator()
 
     group = models.ForeignKey('Group', related_name='users', on_delete=models.PROTECT, default=None, null=True, blank=True)
+    requesting_group = models.ForeignKey('Group', related_name='requesting_users', on_delete=models.PROTECT, default=None, null=True, blank=True)
 
     username = models.CharField(
         _('username'),
@@ -207,3 +208,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
+    
+    def is_owner(self):
+        return self.group.owner == self

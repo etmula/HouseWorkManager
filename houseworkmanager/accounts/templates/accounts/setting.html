@@ -1,27 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<table class="table-responsive-sm w-100">
-    <tbody>
-        <tr>
-            <th>Group</th>
-            <td>{{ user.group.name }}</td>
-            <td><a class='btn btn-primary' href="{% url 'accounts:group_update' user.group.pk %}">Change</a></td>
-        </tr>
-        <tr>
-            <th>Username</th>
-            <td>{{ user.username }}</td>
-            <td><a class='btn btn-primary' href="{% url 'accounts:user_update' user.pk %}">Change</a></td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ user.email }}</td>
-            <td><a class='btn btn-primary' href="{% url 'accounts:email_change' %}">Change</a></td>
-        </tr>
-        <tr>
-            <th>Password</th>
-            <td>●●●●●●●●●●●</td>
-            <td><a class='btn btn-primary' href="{% url 'accounts:password_change' %}">Change</a></td>
-        </tr>
-    </tbody>
-</table>
+<div class="card text-left m-2">
+    <div class="card-header">
+      User
+    </div>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th scope="row">Group</th>
+                <td>{{ user.group.name }}</td>
+                <td><a class='btn btn-success' href="{% url 'accounts:group_detail' user.group.pk %}">Detail</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Username</th>
+                <td>{{ user.username }}</td>
+                <td><a class='btn btn-primary' href="{% url 'accounts:user_update' user.pk %}">Change</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Email</th>
+                <td>{{ user.email }}</td>
+                <td><a class='btn btn-primary' href="{% url 'accounts:email_change' %}">Change</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Password</th>
+                <td>●●●●●●●●●●●</td>
+                <td><a class='btn btn-primary' href="{% url 'accounts:password_change' %}">Change</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Point</th>
+                <td>{{ user.calc_point }}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+
 {% endblock %}

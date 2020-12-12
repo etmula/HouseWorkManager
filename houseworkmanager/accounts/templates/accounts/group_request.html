@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-left m-2">
+  <div class="card-header">
+    Requesting Members
+  </div>
+  <div class="card-body">
+    <p class="card-text">
+        <ul class="list-group">
+        {% for member in group.requesting_users.all %}
+            <li class="list-group-item d-flex">
+              {{ member.username }}
+              <form action="" method="POST" class="ml-auto">
+                {% csrf_token %}
+                <input type="hidden" name="pk" value="{{member.pk}}">
+                <button type="submit" name="command" value="accept" class="btn btn-success  m-1">
+                  Accept
+                </button>
+                <button type="submit" name="command" value="dissmiss" class="btn btn-danger m-1">
+                  Dissmiss
+                </button>
+                </li>
+              </form>
+            </li>
+        {% endfor %}
+        </ul>
+    </p>
+  </div>
+</div>
+{% endblock %}

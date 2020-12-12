@@ -1,24 +1,25 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card text-left">
+<div class="card text-left m-2">
   <div class="card-header">
     Group
   </div>
   <div class="card-body">
     <h5 class="card-title">{{ group.name}}</h5>
     <p class="card-text">
-        <h5>Members</h5>
+      <h5>Members</h5>
         <ul class="list-group">
         {% for member in group.users.all %}
             <li class="list-group-item">{{ member.username }}</li>
         {% endfor %}
-        </ul>
-    </p>
-    
+      </ul>
+    </p> 
   </div>
   <div class="card-footer text-muted">
+    {% if user.is_owner %}
     <a href="{% url 'accounts:group_update' group.id %}" class="btn btn-success">Edit</a>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

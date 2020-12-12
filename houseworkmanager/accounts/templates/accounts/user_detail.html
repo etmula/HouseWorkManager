@@ -1,35 +1,17 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="jumbotron m-1">
-  <h1 class="display-4">{{user.group.name}}</h1>
-  <p class="lead">
-  {% for user in user.group.users.all %}
-    {{user.username}}, 
-  {% endfor %}
-  </p>
-  <hr class="my-4">
-  <p class="lead">
-    <a class='btn btn-primary btn-lg' href="{% url 'accounts:setting' user.pk %}">Setting</a>
-  </p>
+<div class="card text-left m-2">
+  <div class="card-header">
+    User
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">{{ user.username}}</h5>
+    <p class="card-text">Group: {{ user.group.name }}</p>
+    <p class="card-text">Email: {{ user.email }}</p> 
+    <p class="card-text">Point: {{ user.calc_point }}</p> 
+  </div>
+  <div class="card-footer text-muted">
+    <a class='btn btn-success' href="{% url 'accounts:setting' user.pk %}">Edit</a>
+  </div>
 </div>
-<table class="table table-responsive-md w-100">
-    <tbody>
-        <tr>
-            <th>Group</th>
-            <td>{{ user.group.name }}</td>
-        </tr>
-        <tr>
-            <th>Username</th>
-            <td>{{ user.username }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ user.email }}</td>
-        </tr>
-        <tr>
-            <th>Point</th>
-            <td>{{user.calc_point}}</td>
-        </tr>
-    </tbody>
-</table>
 {% endblock %}

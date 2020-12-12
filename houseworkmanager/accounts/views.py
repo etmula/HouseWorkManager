@@ -1,3 +1,7 @@
+
+from urllib.parse import urljoin
+
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
 from django.views import generic
 from django.contrib.auth.views import (
@@ -32,7 +36,7 @@ class Login(LoginView):
     template_name = 'accounts/login.html'
 
 
-class Logout(LoginRequiredMixin, LogoutView):
+class Logout(LogoutView):
     template_name = 'accounts/logout.html'
 
 
@@ -155,13 +159,17 @@ class OnlyNotMemberMixin(UserPassesTestMixin):
     raise_exception = True
 
     def test_func(self):
-        return not self.request.user.group
+        try:
+            return not bool(self.request.user.group)
+        except AttributeError:
+            return True
+        
 
 class OnlyMemberMixin(UserPassesTestMixin):
     raise_exception = True
 
     def test_func(self):
-        return self.request.user in self.request.user.group.users
+        return self.request.user in self.request.user.group.users.all()
 
 class OnlyOwnerMixin(UserPassesTestMixin):
     raise_exception = True
@@ -204,16 +212,43 @@ class GroupCreateView(OnlyNotMemberMixin, generic.CreateView):
 class GroupUpdateView(OnlyOwnerMixin, generic.UpdateView):
     model = Group
 
-    fields = ('name', 'users')
+    fields = ('name',)
 
 
 class GroupDetailView(OnlyMemberMixin, generic.DetailView):
     model = Group
 
 
+class GroupRequestView(OnlyOwnerMixin, generic.DetailView):
+    model = Group
+    template_name = 'accounts/group_request.html'
+
+    def post(self, request, *args, **kwargs):
+        if request.POST['command'] == 'accept':
+            member = User.objects.get(pk=int(request.POST['pk']))
+            member.group = Group.objects.get(pk=int(kwargs['pk']))
+            member.requesting_group = None
+            member.save() 
+            return HttpResponseRedirect(reverse('accounts:group_request', kwargs={'pk': int(kwargs['pk'])}))
+        elif request.POST['command'] == 'dissmiss':
+            member = User.objects.get(pk=int(request.POST['pk']))
+            member.requesting_group = None
+            member.save() 
+            return HttpResponseRedirect(reverse('accounts:group_request', kwargs={'pk': int(kwargs['pk'])}))
+
+
 class GroupInviteView(OnlyOwnerMixin, generic.DetailView):
     model = Group
     template_name = 'accounts/group_invite.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        url = urljoin(
+            self.request._current_scheme_host,
+            reverse('accounts:group_join_request_confirm', kwargs={'pk': kwargs['object'].id})
+        )
+        context['url'] = url
+        return context
 
 
 class GroupQuitConfirmView(OnlyMemberMixin, generic.DetailView):
@@ -235,7 +270,7 @@ class GroupJoinRequestDoneView(OnlyNotMemberMixin, generic.DetailView):
     template_name = 'accounts/group_join_request_done.html'
 
 
-class GroupJoinAcceptView(OnlyOwnerMixin, generic.TemplateView):
+class GroupJoinAcceptView(OnlyOwnerMixin, generic.DetailView):
     model = Group
     template_name = 'accounts/group_join_accept.html'
 
