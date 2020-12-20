@@ -14,11 +14,41 @@
             <li class="list-group-item">{{ member.username }}</li>
         {% endfor %}
       </ul>
-    </p> 
+    </p>
+    {% if user.is_owner %}
+    <p>
+      <h5>
+        Requesting Members
+        <a href="{% url 'accounts:group_join_invite' user.group.pk %}" class="btn btn-primary">Invite</a>
+      </h5>
+      <ul class="list-group">
+        {% for member in group.requesting_users.all %}
+            <li class="list-group-item d-flex">
+              {{ member.username }}
+              <form action="" method="POST" class="ml-auto">
+                {% csrf_token %}
+                <input type="hidden" name="pk" value="{{member.pk}}">
+                <button type="submit" name="command" value="accept" class="btn btn-success  m-1">
+                  Accept
+                </button>
+                <button type="submit" name="command" value="dissmiss" class="btn btn-danger m-1">
+                  Dissmiss
+                </button>
+                </li>
+              </form>
+            </li>
+        {% empty %}
+          <li class="list-group-item d-flex">
+            No requests
+          </li>
+        {% endfor %}
+        </ul>
+      </p>
+      {% endif %}
   </div>
   <div class="card-footer text-muted">
     {% if user.is_owner %}
-    <a href="{% url 'accounts:group_update' group.id %}" class="btn btn-success">Edit</a>
+      <a href="{% url 'accounts:group_update' group.id %}" class="btn btn-success">Edit</a>
     {% endif %}
   </div>
 </div>

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card text-left m-2">
+  <div class="card-header">
+    Invite
+  </div>
+  <div class="card-body">
+    <p class="card-text">
+      <p>下記のURLを参加者に共有する</p>
+        <h5>URL</h5>
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control input-monospace imput-sm bg-gray-light"
+            value="{{ url }}"
+            aria-label="{{ url }}"
+            readonly
+          >
+        </div>
+        <img src="https://chart.apis.google.com/chart?chs=300x300&cht=qr&chl={{ url }}" alt="QRコード">
+    </p>
+    
+  </div>
+</div>
+{% endblock %}
