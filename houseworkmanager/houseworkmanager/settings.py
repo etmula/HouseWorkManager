@@ -11,11 +11,12 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+from distutils.util import strtobool
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-DEBUG = os.environ.get('DEBUG')
+DEBUG = strtobool(str(os.environ.get('DEBUG')))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
@@ -58,7 +59,7 @@ LOGIN_REQUIRED_IGNORE_VIEW_NAMES = [
     'accounts:signup',
     'admin:index',
     'admin:login',
-    'accounts:group_join_request_confirm',
+    'accounts:group_confirm',
     'home:home'
 ]
 
@@ -135,8 +136,6 @@ LOGIN_REDIRECT_URL = 'home:home'
 
 AUTH_USER_MODEL = 'accounts.User'
 
-
-DATABASES = os.environ.get('DATABASES')
 SECRET_KEY = os.environ.get('SECRET_KEY')
 DATABASES = {
     'default': {
