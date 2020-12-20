@@ -1,15 +1,30 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% block content %}
-
-<h1>
-    Update Group
-</h1>
- 
 <form class="" method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <input type="submit" class="btn btn-primary" value="submit">
+<div class="card text-left m-2">
+    <div class="card-header">
+        {% if form.instance.pk %}
+            Update Group
+        {% else %}
+            Create Group
+        {% endif %}
+    </div>
+    <div class="card-body">
+            {% csrf_token %}
+            {{ form|crispy }}
+            {% if form.instance.pk  %}
+                <ul class="list-group">
+                    {% for member in form.instance.users.all %}
+                        <li class="list-group-item">{{member.username}}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        
+    </div>
+    <div class="card-footer text-muted">
+        <button type="submit" class="btn btn-primary" value="submit">submit</button>
+    </div>
+  </div>
 </form>
-
 {% endblock %}

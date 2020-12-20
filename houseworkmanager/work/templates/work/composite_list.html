@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load accounts %}
+{% load charts %}
+
+{% block head %}
+<!-- Bootstrap-datepicker -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.ja.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet" type="text/css">
+<!-- jquery-cookie -->
+<script src="{% static 'work/js/jquery.cookie.js' %}"></script>
+<script src="{% static 'work/js/composite_list.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+{% users_point_form user%}
+<div class="card text-left m-2">
+    <div class="card-body">
+        <div class="form-group row m-1">
+            <label for="datepicker" class="col-4 col-form-label">Execute date</label>
+            <div class="col-8">
+              <input id="datepicker" data-provide="datepicker" class=" form-control datepicker m-1 inline" type="text" name="date" value=""　placeholder="Date">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="container justify-content-center">
+    <div class="row m-1">
+        <nav class="btn-group float-right col-10 pl-0" aria-label="breadcrumb">
+            <ol class="breadcrumb w-100">
+                {% if parent %}
+                    <li class="breadcrumb-item" aria-current="page"><a href="{% url 'work:composite_list' 0%}">Home</a></li>
+                {% else %}
+                    <li class="breadcrumb-item active" aria-current="page">Home</li>
+                {% endif %}
+                {% for composite in parent.get_parents%}
+                    <li class="breadcrumb-item" aria-current="page"><a href="{{composite.get_absolute_url}}">{{composite.name}}</a></li>
+                {% endfor %}
+                <li class="breadcrumb-item active" aria-current="page">{{parent.name}}</li>
+            </ol>
+        </nav>
+        <button type="button" class="btn btn-primary btn-sm col-2 dropdown-toggle mb-3" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Create
+        </button>
+        <div class="dropdown-menu dropdown-menu-right">
+            {% if parent %}
+                <a class="dropdown-item" href="{% url 'work:composite_create' parent.id %}">Folder</a>
+                <a class="dropdown-item" href="{% url 'work:work_create' parent.id %}">Work</a>
+            {% else %}
+                <a class="dropdown-item" href="{% url 'work:composite_create' 0 %}">Folder</a>
+                <a class="dropdown-item" href="{% url 'work:work_create' 0 %}">Work</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row float-center m-1">
+        <ul class='list-group list-group-flush w-100 float-center'>
+            {% for item in composite_list %}
+                <div class="list-group-item row">
+                    <a class='col-11 d-inline-block row' href='{{ item.get_absolute_url }}'>
+                        <span class='col-6 d-inline-block px-0'>{{item.name}}</span>
+                    </a>
+                    <div class="btn-group col-1 align-self-end p-0">
+                        <button type="button" class="btn btn-sm dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"><path d="M8 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zM1.5 9a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'work:composite_update' item.id %}">Rename</a>
+                        </div>
+                    </div>
+                    
+                </div>
+            {% endfor %}
+            {% for item in work_list %}
+                <div class="list-group-item row work">
+                    <a class='col-9 d-inline-block row' href='{{ item.get_absolute_url }}'>
+                        <span class='d-inline-block px-0'>{{item.name}}</span>
+                    </a>
+                    <div class="btn-group col-3 align-self-end p-0">
+                        <button  class="btn btn-success btn-sm submit_work" work-id={{item.id}}>{{item.point}}</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+
+
+{% endblock %}

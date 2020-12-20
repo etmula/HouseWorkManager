@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  db:
+    image: postgres:latest
+    env_file:
+      - .env.db
+  python:
+    image: etmula/houseworkmanager:latest
+    env_file:
+      - .env
+    depends_on:
+      - db
+  nginx:
+    image: etmula/django-nginx
+    ports:
+      - "8000:8000"
+    depends_on:
+      - python

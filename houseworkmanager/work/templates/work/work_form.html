@@ -1,19 +1,29 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block content %}
+{% load charts %}
 
-<h1>
-    {% if not form.instance.pk %}
-    Create Work
-    {% else %}
-    Update Work
-    {% endif %}
-</h1>
- 
-<form class="" method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <input type="submit" class="btn btn-primary" value="submit">
-</form>
+{% block content %}
+<div class="card text-left m-2">
+    <div class="card-header">
+        {% if not form.instance.pk %}
+            Create Work
+        {% else %}
+            Update Work
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <form class="" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <hr>
+        <button type="submit" class="btn btn-success btn-lg btn-block">Create</button>
+    </form>
+    </div>
+</div>
+{% if form.instance.pk %}
+<div class="card text-left m-2">
+    {% show_chart chart %}
+</div>
+{% endif %}
 
 {% endblock %}

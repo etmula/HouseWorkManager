@@ -4,30 +4,32 @@
 {% block content %}
 <div class="card text-left m-1">
   <div class="card-header">
-    {{work.category.name}}
-    <span class="badge badge-info">
-      {% if worl.last_exected_date %}
-        {{ work.last_exected_date }}に実行
+    {{ work.name}}
+    <span class="badge badge-info inline">
+      {% if work.get_latest_exected %}
+        {{ work.get_latest_exected.exected_date }}に実行
       {% else %}
         未実行  
       {% endif %}
     </span>
   </div>
   <div class="card-body">
-    <h5 class="card-title">{{ work.head.name}}</h5>
     <p class="card-text">
+        <p>updated_at: {{work.updated_at}}</p>
+        <p>point: {{work.point}}</p>
+        <p>description: {{work.description}}</p>
         <p>alert: {{ work.alert }}</p>
-        <p>created_at: {{work.head.created_at}}</p>
-        <p>point: {{work.head.point}}</p>
-        <p>description: {{work.head.description}}</p>
     </p>
     
   </div>
   <div class="card-footer text-muted">
-    <a href="{% url 'work:workcommit_create' work.id %}" class="btn btn-success">Update</a>
-    <a href="{% url 'work:workcommit_list' work.id %}" class="btn btn-primary">History</a>
+    <a href="{% url 'work:work_update' work.id %}" class="btn btn-success">Update</a>
+    {% if work.id %}
+      <a href="{% url 'work:work_workexectedrecode_list' work.id %}" class="btn btn-primary">History</a>
+    {% else %}
+      <a href="{% url 'work:work_workexectedrecode_list' work.id %}" class="btn btn-primary">History</a>
+    {% endif %}
     <a href="{% url 'work:work_delete' work.id %}" class="btn btn-danger">Delete</a>
   </div>
 </div>
-{% show_chart chart %}
 {% endblock %}

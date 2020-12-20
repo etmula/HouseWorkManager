@@ -10,7 +10,8 @@ from django.utils import timezone
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.shortcuts import reverse
 
-from history.models import Recode
+from work.models import WorkExectedRecode
+
 
 class CustomUserManager(UserManager):
     use_in_migrations = True
@@ -44,6 +45,11 @@ class CustomUserManager(UserManager):
 
 class Group(models.Model):
     name = models.CharField(max_length=50)
+    owner = models.OneToOneField(
+        'User',
+        related_name='own_group',
+        on_delete=models.PROTECT,
+    )
 
     def __str__(self):
         return self.name
@@ -56,30 +62,40 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse("accounts:group_detail", kwargs={"pk": self.pk})
-    
+
     def make_point_dict(self, startdate, enddate):
-        recodes = Recode.objects.filter(group=self, exected_date__range=[startdate, enddate])
+        workexectedrecodes = WorkExectedRecode.objects.filter(
+            group=self,
+            exected_date__range=[startdate, enddate]
+        )
         users = self.users
         point_dict = {}
-        
-        for recode in recodes:
-            if not recode.workcommit in point_dict.keys():
-                point_dict[recode.workcommit] = {user.username:0 for user in users.all()}
-            for executer in recode.executers.all():
-                    point_dict[recode.workcommit][executer.username] += recode.workcommit.point
+
+        for workexectedrecode in workexectedrecodes:
+            if workexectedrecode.workcommit not in point_dict.keys():
+                point_dict[workexectedrecode.workcommit] = {
+                    user.username: 0 for user in users.all()
+                }
+            for executer in workexectedrecode.executers.all():
+                point_dict[workexectedrecode.workcommit][executer.username] += workexectedrecode.workcommit.point
 
         return point_dict
 
     def make_count_dict(self, startdate, enddate):
-        recodes = Recode.objects.filter(group=self, exected_date__range=[startdate, enddate])
+        workexectedrecodes = WorkExectedRecode.objects.filter(
+            group=self,
+            exected_date__range=[startdate, enddate]
+        )
         users = self.users
         count_dict = {}
-            
-        for recode in recodes:
-            if not recode.workcommit in count_dict.keys():
-                count_dict[recode.workcommit] = {user.username:0 for user in users.all()}
-            for executer in recode.executers.all():
-                    count_dict[recode.workcommit][executer.username] += 1
+
+        for workexectedrecode in workexectedrecodes:
+            if workexectedrecode.workcommit not in count_dict.keys():
+                count_dict[workexectedrecode.workcommit] = {
+                    user.username: 0 for user in users.all()
+                }
+            for executer in workexectedrecode.executers.all():
+                count_dict[workexectedrecode.workcommit][executer.username] += 1
 
         return count_dict
 
@@ -87,10 +103,10 @@ class Group(models.Model):
         startdate = datetime(year, month, 1)
         enddate = datetime(year, month, calendar.monthrange(year, month)[1])
         users = self.users.all()
-        table = [['work_name',] + [user.username for user in users],]
+        table = [['work_name', ] + [user.username for user in users], ]
         point_dict = self.make_point_dict(startdate, enddate)
         for key, value in point_dict.items():
-            row = [key.name,]
+            row = [key.name, ]
             for user in users.all():
                 row.append(value[user.username])
             table.append(row)
@@ -100,21 +116,22 @@ class Group(models.Model):
         startdate = datetime(year, month, 1)
         enddate = datetime(year, month, calendar.monthrange(year, month)[1])
         users = self.users.all()
-        table = [['work_name',] + [user.username for user in users],]
+        table = [['work_name', ] + [user.username for user in users], ]
         count_dict = self.make_count_dict(startdate, enddate)
         for key, value in count_dict.items():
-            row = [key.name,]
+            row = [key.name, ]
             for user in users:
                 row.append(value[user.username])
             table.append(row)
         return table
-    
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """カスタムユーザーモデル."""
     username_validator = UnicodeUsernameValidator()
 
     group = models.ForeignKey('Group', related_name='users', on_delete=models.PROTECT, default=None, null=True, blank=True)
+    requesting_group = models.ForeignKey('Group', related_name='requesting_users', on_delete=models.PROTECT, default=None, null=True, blank=True)
 
     username = models.CharField(
         _('username'),
@@ -170,22 +187,30 @@ class User(AbstractBaseUser, PermissionsMixin):
         """Return the short name for the user."""
         return self.first_name
 
-    def calc_point(self, startdate=None, enddate=None, work=None):    
-        recodes = self.recodes
+    def calc_point(self, startdate=None, enddate=None, work=None):
+        workexectedrecodes = self.workexectedrecodes
         if work:
-            recodes = recodes.filter(workcommit__in=work.commits.all())
+            workexectedrecodes = workexectedrecodes.filter(work=work)
         if startdate:
-            recodes = recodes.filter(exected_date__gte=startdate)
+            workexectedrecodes = workexectedrecodes.filter(
+                exected_date__gte=startdate
+            )
         if enddate:
-            recodes = recodes.filter(exected_date__lte=enddate)
+            workexectedrecodes = workexectedrecodes.filter(
+                exected_date__lte=enddate
+            )
 
-        points= 0
-        for recode in recodes.all():
-            points += recode.workcommit.point
+        points = 0
+        for workexectedrecode in workexectedrecodes.all():
+            points += workexectedrecode.point
         return points
 
     def email_user(self, subject, message, from_email=None, **kwargs):
         """Send an email to this user."""
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
+    def is_owner(self):
+        return self.group.owner == self
 
+    def is_member(self):
+        return self.group

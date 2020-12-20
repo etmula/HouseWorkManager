@@ -1,0 +1,110 @@
+[
+    {
+        "model": "accounts.Group",
+        "pk": 100,
+        "fields": {
+            "name": "Yamada",
+            "owner": 100
+        }
+    },
+    {
+        "model": "accounts.User",
+        "pk": 100,
+        "fields": {
+            "username": "Taro",
+            "email": "Taro@sample.sample",
+            "password": "password",
+            "group": 100
+        }
+    },
+    {
+        "model": "accounts.User",
+        "pk": 200,
+        "fields": {
+            "username": "Hanako",
+            "email": "Hanako@sample.sample",
+            "password": "password",
+            "group": 100
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "掃除機",
+            "point": 10
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "朝食",
+            "point": 10
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "昼食",
+            "point": 10
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "夕食",
+            "point": 10
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "洗濯",
+            "point": 10
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "ごみ捨て",
+            "point": 10
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "浴槽掃除",
+            "point": 30
+        }
+    },
+    {
+        "model": "work.Work",
+        "fields": {
+            "created_at": "2020-1-1 00:00",
+            "updated_at": "2020-1-1 00:00",
+            "group": 100,
+            "name": "布団洗濯",
+            "point": 30
+        }
+    }
+]

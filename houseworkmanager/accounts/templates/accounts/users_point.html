@@ -1,18 +1,23 @@
-<table class="table table-sm" id='users-point-table'>
-  <thead>
-    <tr>
-      <th scope="col">User</th>
-      <th scope="col">Total</th>
-      <th scope="col">Monthly</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for row in table %}
-        <tr>
-            <th scope='row'>{{ row.user.username}}</th>
-            <td>{{ row.total_point }}</td>
-            <td>{{ row.monthly_point }}</td>
-        </tr>
-    {% endfor %}
-  </tbody>
-</table>
+<div class="card text-left m-2">
+  <div class="card-body">
+  <table class="table table-sm" id='users-point-table'>
+    <thead>
+      <tr>
+        <th scope="col">User</th>
+        <th scope="col">Total</th>
+        <th scope="col">Monthly</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in table %}
+          <tr>
+              <th scope='row'>{{ row.user.username}}</th>
+              <td>{{ row.total_point }}</td>
+              <td>{{ row.monthly_point }}</td>
+          </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+

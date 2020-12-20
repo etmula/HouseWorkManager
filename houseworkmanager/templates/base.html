@@ -19,74 +19,88 @@
         <!-- base CSS, JavaScript -->
         <link rel='stylesheet' href="{% static 'CSS/base.css' %}" type='text/css'></link>
 
+        <!-- favicon -->
+        <link rel="apple-touch-icon" sizes="57x57" href='{% static "icon/apple-icon-57x57.png" %}'>
+        <link rel="apple-touch-icon" sizes="60x60" href='{% static "icon/apple-icon-60x60.png" %}'>
+        <link rel="apple-touch-icon" sizes="72x72" href='{% static "icon/apple-icon-72x72.png" %}'>
+        <link rel="apple-touch-icon" sizes="76x76" href='{% static "icon/apple-icon-76x76.png" %}'>
+        <link rel="apple-touch-icon" sizes="114x114" href='{% static "icon/apple-icon-114x114.png" %}'>
+        <link rel="apple-touch-icon" sizes="120x120" href='{% static "icon/apple-icon-120x120.png" %}'>
+        <link rel="apple-touch-icon" sizes="144x144" href='{% static "icon/apple-icon-144x144.png" %}'>
+        <link rel="apple-touch-icon" sizes="152x152" href='{% static "icon/apple-icon-152x152.png" %}'>
+        <link rel="apple-touch-icon" sizes="180x180" href='{% static "icon/apple-icon-180x180.png" %}'>
+        <link rel="icon" type="image/png" sizes="192x192"  href='{% static "icon/android-icon-192x192.png" %}'>
+        <link rel="icon" type="image/png" sizes="32x32" href='{% static "icon/favicon-32x32.png" %}'>
+        <link rel="icon" type="image/png" sizes="96x96" href='{% static "icon/favicon-96x96.png" %}'>
+        <link rel="icon" type="image/png" sizes="16x16" href='{% static "icon/favicon-16x16.png" %}'>
+        <link rel="manifest" href='{% static "icon/manifest.json" %}'>
+        <meta name="msapplication-TileColor" content="#ffffff">
+        <meta name="msapplication-TileImage" content="/ms-icon-144x144.png">
+        <meta name="theme-color" content="#ffffff">
+
         {% block head %}{% endblock %}
     </head>
     <body>
         <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-            <a class="navbar-brand" href="{% url 'exec:home'%}">{{ user.group.name }}</a>
+            {% if user.is_member %}
+                <a class="navbar-brand" href="{% url 'work:composite_list' 0 %}">{{user.group.name}}</a>
+            {% else %}
+                <a class="navbar-brand" href="{% url 'home:home' %}">HWM</a>
+            {% endif %}
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
+
             
             <div class="collapse navbar-collapse" id="navbarsExampleDefault">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'exec:exec'%}">exec</a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'history:recode_list'%}">history</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">History</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'history:recode_list'%}">Total</a>
-                            <a class="dropdown-item" href="{% url 'history:recode_list_monthly' current_year current_month %}">Monthly</a>
-                        </div>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{% url 'work:work_list'%}">work</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Work</a>
-                        <div class="dropdown-menu">
-                            <a class="dropdown-item" href="{% url 'work:category_list'%}">Category</a>
-                            <a class="dropdown-item" href="{% url 'work:work_list'%}">Work</a>
-                        </div>
-                    </li>
+                    {% if user.is_member %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'work:history' user.group.pk|default:0 %}">history</a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'work:composite_list' 0 %}">work</a>
+                        </li>
+                    {% endif%}
                 </ul>
                 <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                <li class="nav-item dropdown active">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarAccounts" role="button" data-toggle="dropdown" aria-haspopupp="true" aria-expanded="false">
-                      {{ user.get_username }}
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarAccounts">
-                        <a class="dropdown-item" href="{% url 'accounts:user_detail' user.pk %}">
-                            User informations
-                        </a>
-                        <a class="dropdown-item" href="{% url 'accounts:logout' %}" class="logout">
-                            Logout
-                        </a>
-                    </div>
-                </li>
-                {% else %}
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'accounts:signup' %}" class="signup">
-                        Sign up
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="{% url 'accounts:login' %}" class="login">
-                        Login
-                    </a>
-                </li>
-                {% endif %}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item dropdown active">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarAccounts" role="button" data-toggle="dropdown" aria-haspopupp="true" aria-expanded="false">
+                            {{ user.get_username }}
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarAccounts">
+                                <a class="dropdown-item" href="{% url 'accounts:user_detail' user.pk %}">
+                                    User Detail
+                                </a>
+                                {% if user.is_member %}
+                                    <a class="dropdown-item" href="{% url 'accounts:group_detail' user.group.pk|default:0 %}">
+                                        Group Detail
+                                    </a>
+                                {% endif %}
+                                <a class="dropdown-item" href="{% url 'accounts:logout' %}" class="logout">
+                                    Logout
+                                </a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'accounts:signup' %}" class="signup">
+                                Sign up
+                            </a>
+                        </li>
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{% url 'accounts:login' %}" class="login">
+                                Login
+                            </a>
+                        </li>
+                    {% endif %}
                 </ul>
                 </select>
             </div>
         </nav>
-        
-        <main id='main' role="main" class="container h-100">
+
+        <main id='main' role="main" class="">
             {% block content %}{% endblock %} 
         </main><!-- /.container -->
         

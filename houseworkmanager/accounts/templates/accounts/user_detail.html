@@ -1,35 +1,49 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="jumbotron m-1">
-  <h1 class="display-4">{{user.group.name}}</h1>
-  <p class="lead">
-  {% for user in user.group.users.all %}
-    {{user.username}}, 
-  {% endfor %}
-  </p>
-  <hr class="my-4">
-  <p class="lead">
-    <a class='btn btn-primary btn-lg' href="{% url 'accounts:setting' user.pk %}">Setting</a>
-  </p>
-</div>
-<table class="table table-responsive-md w-100">
-    <tbody>
-        <tr>
-            <th>Group</th>
-            <td>{{ user.group.name }}</td>
-        </tr>
-        <tr>
-            <th>Username</th>
-            <td>{{ user.username }}</td>
-        </tr>
-        <tr>
-            <th>Email</th>
-            <td>{{ user.email }}</td>
-        </tr>
-        <tr>
-            <th>Point</th>
-            <td>{{user.calc_point}}</td>
-        </tr>
-    </tbody>
-</table>
+<div class="card text-left m-2">
+    <div class="card-header">
+      User
+    </div>
+    <table class="table">
+        <tbody>
+            {% if user.is_member %}
+                <tr>
+                    <th scope="row">Group</th>
+                    <td>{{ user.group.name }}</td>
+                    <td><a class='btn btn-success' href="{% url 'accounts:group_detail' user.group.pk|default:0 %}">Detail</a></td>
+                </tr>
+            {% else %}
+                <tr>
+                    <th scope="row">Group</th>
+                    <td>-</td>
+                    <td>
+                        <a class='btn btn-success' href="{% url 'accounts:group_create' %}">Create</a>
+                        <a class='btn btn-success' href="{% url 'accounts:group_join_request' %}">Join</a>
+                    </td>
+                </tr>
+            {% endif %}
+            <tr>
+                <th scope="row">Username</th>
+                <td>{{ user.username }}</td>
+                <td><a class='btn btn-primary' href="{% url 'accounts:user_update' user.pk %}">Change</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Email</th>
+                <td>{{ user.email }}</td>
+                <td><a class='btn btn-primary' href="{% url 'accounts:email_change' %}">Change</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Password</th>
+                <td>●●●●●●●●●●●</td>
+                <td><a class='btn btn-primary' href="{% url 'accounts:password_change' %}">Change</a></td>
+            </tr>
+            <tr>
+                <th scope="row">Point</th>
+                <td>{{ user.calc_point }}</td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+  </div>
+
 {% endblock %}

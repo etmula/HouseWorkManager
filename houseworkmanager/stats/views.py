@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.shortcuts import render
 
-from history.models import Recode
+from work.models import WorkExectedRecode
 
 
 def score_user_line(request, year, month):

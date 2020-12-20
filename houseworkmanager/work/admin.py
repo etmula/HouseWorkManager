@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from .models import Category, Work, WorkCommit
+from .models import Composite, Work, WorkExectedRecode, WorkUpdatedRecode
 
-# Register your models here.
-
-admin.site.register(Category)
+admin.site.register(Composite)
 admin.site.register(Work)
-admin.site.register(WorkCommit)
+admin.site.register(WorkExectedRecode)
+admin.site.register(WorkUpdatedRecode)

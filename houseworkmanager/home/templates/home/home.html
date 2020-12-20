@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load charts %}
+{% load accounts %}
+
+{% block head %}
+<!-- base CSS, JavaScript -->
+<link rel='stylesheet' href="{% static 'home/CSS/home.css' %}" type='text/css'></link>
+{% endblock %}
+
+{% block content %}
+
+<div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-light">
+    <div class="col-md-5 p-lg-5 mx-auto my-5">
+        <h1 class="display-4 font-weight-normal">HouseWorkManager</h1>
+        <p class="lead font-weight-normal">お家の家事を"見える"化する.</p>
+        <a class="btn btn-outline-secondary" href="{% url 'accounts:signup' %}">はじめる</a>
+    </div>
+    <div class="product-device shadow-sm d-none d-md-block"></div>
+    <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+</div>
+
+<div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+    <div class="bg-info mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+        <div class="my-3 py-3">
+            <h2 class="display-5">Cost</h2>
+            <p class="lead">家事に費やした労力が見える</p>
+        </div>
+        <div class="mx-auto" style="width: 80%; height: 300px;">
+            <img src="{% static 'home/images/history.png'%}" alt="" style="border-radius: 21px 21px 0 0;">
+        </div>
+    </div>
+    <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+            <h2 class="display-5">Maintenance</h2>
+            <p class="lead">家事を行った履歴が見える</p>
+        </div>
+        <div class="mx-auto" style="width: 80%; height: 300px;">
+            <img src="{% static 'home/images/work_exec_history.png'%}" alt="" style="border-radius: 21px 21px 0 0;">
+        </div>
+    </div>
+</div>
+
+<div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+    <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 p-3">
+        <h2 class="display-5">Group</h2>
+        <p class="lead">家族で使うと負担が見える</p>
+        </div>
+        <div class="mx-auto" style="width: 80%; height: 300px;">
+            <img src="{% static 'home/images/execution_rate_pie_chart.png'%}" alt="" style="border-radius: 21px 21px 0 0;">
+        </div>
+    </div>
+    <div class="bg-secondary mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+        <div class="my-3 py-3">
+        <h2 class="display-5">Brashup</h2>
+        <p class="lead">家事のノウハウを蓄積できる</p>
+        </div>
+        <div class="mx-auto" style="width: 80%; height: 300px;">
+            <img src="{% static 'home/images/work_history.png'%}" alt="" style="border-radius: 21px 21px 0 0;">
+        </div>
+    </div>
+</div>
+
+<div class="d-md-flex flex-md-equal w-100 my-md-3 pl-md-3">
+    <div class="bg-info mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center text-white overflow-hidden">
+        <div class="my-3 p-3">
+        <h2 class="display-5">Multi-device</h2>
+        <p class="lead">iPhone, Android, Tablet, PC, etc</p>
+        </div>
+        <div class="mx-auto" style="width: 80%; height: 300px;">
+            <img src="{% static 'home/images/multi-device.png'%}" alt="" style="border-radius: 21px 21px 0 0;">
+        </div>
+    </div>
+    <div class="bg-light mr-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
+        <div class="my-3 py-3">
+        <h2 class="display-5">Simple UI</h2>
+        <p class="lead">毎日の操作を最小限の操作で</p>
+        </div>
+        <div class="mx-auto" style="width: 80%; height: 300px;">
+            <img src="{% static 'home/images/work.png'%}" alt="" style="border-radius: 21px 21px 0 0;">
+        </div>
+    </div>
+</div>
+
+<footer class="container py-5">
+<div class="row">
+    <div class="col-12 col-md">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="d-block mb-2" role="img" viewBox="0 0 24 24" focusable="false"><title>Product</title><circle cx="12" cy="12" r="10"/><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83m13.79-4l-5.74 9.94"/></svg>
+    </div>
+    <div class="col-6 col-md">
+    <h5>About</h5>
+    <ul class="list-unstyled text-small">
+        <li><a class="text-muted" href="https://github.com/etmula/HouseWorkManager">GitHub</a></li>
+    </ul>
+    </div>
+</div>
+</footer>
+
+{% endblock %}
